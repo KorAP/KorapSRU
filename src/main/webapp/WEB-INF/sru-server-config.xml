@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoint-config xmlns="http://www.clarin.eu/sru-server/1.0/">
+    <databaseInfo>
+        <title xml:lang="de">KorAP</title>
+        <title xml:lang="en" primary="true">KorAP</title>
+        <description xml:lang="de">Suche mit KorAP via SRU.</description>
+        <description xml:lang="en" primary="true">Search in KorAP via SRU.</description>
+        <author xml:lang="en">Institute for the German language</author>
+        <author xml:lang="de" primary="true">Institut für Deutsche Sprache</author>     
+    </databaseInfo>
+    
+    <indexInfo>
+        <set name="fcs" identifier="clarin.eu/fcs/1.0">
+            <title xml:lang="de">CLARIN Content Search</title>
+            <title xml:lang="en" primary="true">CLARIN Content Search</title>
+        </set>
+        <index search="true" scan="false" sort="false">
+            <title xml:lang="en" primary="true">Words</title>
+            <map primary="true">
+                <name set="fcs">words</name>
+            </map>
+        </index>        
+    </indexInfo>
+    
+    <schemaInfo>
+        <schema identifier="http://clarin.eu/fcs/1.0" name="fcs"
+                sort="false" retrieve="true">
+            <title xml:lang="en" primary="true">CLARIN Content Search</title>
+        </schema>
+    </schemaInfo>
+
+</endpoint-config>

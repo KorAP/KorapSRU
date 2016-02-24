@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    id="KorapSRU" version="2.5">
+  <display-name>KorapSRU</display-name>
+
+  <servlet>
+    <display-name>KorAP SRU/CQL Service (HTTP Interface)</display-name>
+    <servlet-name>KorapSRU</servlet-name>
+    <servlet-class>eu.clarin.sru.server.utils.SRUServerServlet</servlet-class>    
+    <init-param>
+        <param-name>eu.clarin.sru.server.numberOfRecords</param-name>
+        <param-value>25</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.maximumRecords</param-name>
+        <param-value>50</param-value>
+    </init-param> 
+    <init-param>
+        <param-name>eu.clarin.sru.server.transport</param-name>
+        <param-value>http</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.host</param-name>
+        <param-value>clarin.ids-mannheim.de</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.port</param-name>
+        <param-value>80</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.database</param-name>
+        <param-value>korapsru</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.allowOverrideMaximumRecords</param-name>
+        <param-value>false</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.allowOverrideIndentResponse</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <init-param>
+        <param-name>eu.clarin.sru.server.utils.sruServerSearchEngineClass</param-name>
+        <param-value>de.mannheim.ids.korap.sru.KorapSRU</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>KorapSRU</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ResourceService</servlet-name>
+    <jsp-file>/_redirect.jsp</jsp-file>
+    <init-param>
+      <param-name>korapWebUrl</param-name>
+      <param-value>http://korap.ids-mannheim.de/app/#!login</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ResourceService</servlet-name>
+    <url-pattern>/redirect/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
