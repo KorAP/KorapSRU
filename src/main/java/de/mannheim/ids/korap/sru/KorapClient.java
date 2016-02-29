@@ -1,19 +1,12 @@
 package de.mannheim.ids.korap.sru;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -27,7 +20,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -36,26 +28,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KorapClient {
 	
-	private static final String SERVICE_URI = "http://10.0.10.13:8888/api/v0.1/";
+	private static final String SERVICE_URI = "http://10.0.10.13:7070/api/v0.1/";
 	private String QUERY_LANGUAGE = "CQL";
 	private String CONTEXT_TYPE = "sentence";
 	
-	private int defaultNumOfRecords;
-	private int defaultMaxRecords;
+	private int defaultNumOfRecords = 10;
+	private int defaultMaxRecords = 10;
 	
 	private ObjectMapper objectMapper;
-	private SAXParserFactory saxParserFactory;
 	private Logger logger = (Logger) LoggerFactory.getLogger(KorapClient.class);
 	
 	public KorapClient(int numOfRecords, int maxRecords) {
-		objectMapper = new ObjectMapper();
-		saxParserFactory = SAXParserFactory.newInstance();
-		
+		this.objectMapper = new ObjectMapper();
 		this.defaultNumOfRecords = numOfRecords;
 		this.defaultMaxRecords = maxRecords;
 	}
 	
-	public JsonNode retrieveResources() throws HttpResponseException, Exception{
+	public JsonNode retrieveResources() throws URISyntaxException, IOException {
 		
 		URIBuilder builder = new URIBuilder(SERVICE_URI+"VirtualCollection");
 		//builder.addParameter("type", "VirtualCollection");
@@ -65,7 +54,7 @@ public class KorapClient {
 		
 		CloseableHttpClient client = HttpClients.createDefault();
 		CloseableHttpResponse response = null;		
-		JsonNode resources;
+		JsonNode resources = null;
 		
 		try {
 			response = client.execute(httpRequest);
@@ -80,13 +69,11 @@ public class KorapClient {
 			}
 			
 			BufferedInputStream jsonStream = new BufferedInputStream( 
-					response.getEntity().getContent() );			
+					response.getEntity().getContent() );
 			try {				
 				resources = objectMapper.readValue(jsonStream, JsonNode.class);
-			} catch (JsonParseException e) {
-				throw new Exception("Failed parsing JSON.");
-			} catch (JsonMappingException e) {
-				throw new Exception("Failed mapping JSON.");
+			} catch (JsonParseException | JsonMappingException e) {
+				throw e;
 			}
 			finally{
 				jsonStream.close();
@@ -101,7 +88,8 @@ public class KorapClient {
 	
 	
 	public KorapResult query(String query, String version, int startRecord, 
-			int maximumRecords, String[] corpora) throws HttpResponseException, Exception{
+			int maximumRecords, String[] corpora) throws HttpResponseException,
+			IOException {
 		
 		checkQuery(query, startRecord, maximumRecords);
 		
@@ -157,10 +145,8 @@ public class KorapClient {
 					response.getEntity().getContent() );	
 			try {				
 				result = objectMapper.readValue(jsonStream, KorapResult.class);
-			} catch (JsonParseException e) {
-				throw new Exception("Failed parsing JSON.");
-			} catch (JsonMappingException e) {
-				throw new Exception("Failed mapping JSON.");
+			} catch (IOException e) {
+				throw new IOException("Failed processing response.");
 			}
 			finally{
 				jsonStream.close();
@@ -168,15 +154,6 @@ public class KorapClient {
 		}	
 		finally{
 			response.close();
-		}
-		
-		try {
-			logger.info("Matches size: "+ result.getMatches().size());
-			logger.debug("Parsing snippets");
-			parseMatchSnippets(result);
-			
-		} catch (ParserConfigurationException | SAXException e) {
-			throw new Exception("Failed parsing snippet.");
 		}
 		
 		return result;
@@ -191,20 +168,6 @@ public class KorapClient {
 		errorItems[0] = errorItems[0].replace("SRU diagnostic ", "");
 		errorItems[1] = errorItems[1].trim();
 		return errorItems;						
-	}
-	
-	private void parseMatchSnippets(KorapResult result) 
-			throws ParserConfigurationException, SAXException, IOException {
-				
-		String snippet;
-		InputStream is;
-		SAXParser saxParser = saxParserFactory.newSAXParser();
-		for (KorapMatch m : result.getMatches()){			
-			snippet = "<snippet>"+m.getSnippet()+"</snippet>";
-			is = new ByteArrayInputStream(snippet.getBytes());
-			saxParser.parse(is, new KorapMatchHandler(m));			
-			//logger.info("left {}, key {}, right {} ", m.getLeftContext(), m.getKeyword(), m.getRightContext());
-		}		
 	}
 	
 	private HttpGet createRequest(String query, String version, int startRecord, 

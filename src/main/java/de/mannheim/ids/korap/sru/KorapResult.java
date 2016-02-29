@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KorapResult {
-	int totalResults;
-	List<KorapMatch> matches;
+	private int totalResults;
+	private List<KorapMatch> matches;
 	
 	public KorapResult() {
 		matches = new ArrayList<KorapMatch>();
@@ -28,13 +28,13 @@ public class KorapResult {
 	}
 	
 	public KorapMatch getMatch(int i){
-		if (i>=0 && i< getSize())
+		if (i>=0 && i< getMatchSize())
 			return matches.get(i);
 		
 		return null;
 	}
 	
-	public int getSize(){
+	public int getMatchSize(){
 		return matches.size();
 	}
 }

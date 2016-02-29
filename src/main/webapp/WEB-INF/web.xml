@@ -58,7 +58,7 @@
     <jsp-file>/_redirect.jsp</jsp-file>
     <init-param>
       <param-name>korapWebUrl</param-name>
-      <param-value>http://korap.ids-mannheim.de/app/#!login</param-value>
+      <param-value>http://korap.ids-mannheim.de/kalamar</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
