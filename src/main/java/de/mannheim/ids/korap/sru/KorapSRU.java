@@ -10,10 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.z3950.zing.cql.CQLNode;
 
+import eu.clarin.sru.server.CQLQueryParser;
 import eu.clarin.sru.server.SRUConfigException;
 import eu.clarin.sru.server.SRUConstants;
 import eu.clarin.sru.server.SRUDiagnosticList;
 import eu.clarin.sru.server.SRUException;
+import eu.clarin.sru.server.SRUQueryParserRegistry;
 import eu.clarin.sru.server.SRURequest;
 import eu.clarin.sru.server.SRUSearchResultSet;
 import eu.clarin.sru.server.SRUServerConfig;
@@ -28,10 +30,8 @@ import eu.clarin.sru.server.fcs.SimpleEndpointSearchEngineBase;
  * */
 public class KorapSRU extends SimpleEndpointSearchEngineBase{
 
-//	private static final String RESOURCE_INFO_INVENTORY_URL =
-//            "/WEB-INF/resource-info.xml";
 	public static final String CLARIN_FCS_RECORD_SCHEMA =
-            "http://clarin.eu/fcs/1.0";
+            "http://clarin.eu/fcs/resource";
 	public static final String KORAP_WEB_URL = 
 			"http://korap.ids-mannheim.de/kalamar";
 	
@@ -53,8 +53,9 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase{
 	
 	@Override
 	protected void doInit(ServletContext context, SRUServerConfig config,
-			Map<String, String> params) throws SRUConfigException {
-		
+			SRUQueryParserRegistry.Builder parserRegistryBuilder,
+			Map<String, String> params)
+			throws SRUConfigException {
 		serverConfig = config;
 		korapClient = new KorapClient(config.getNumberOfRecords(), 
 				config.getMaximumRecords());
@@ -84,7 +85,17 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase{
 					request.getExtraRequestData("x-fcs-dataviews"), diagnostics);
 		}
 
-        String korapQuery = translateCQLtoKorapQuery(request.getQuery());
+		if (!request.isQueryType(Constants.FCS_QUERY_TYPE_CQL)) {
+			throw new SRUException(
+					SRUConstants.SRU_CANNOT_PROCESS_QUERY_REASON_UNKNOWN,
+					"Queries with queryType '"
+							+ request.getQueryType()
+							+ "' are not supported by this CLARIN-FCS Endpoint.");
+		}
+		CQLQueryParser.CQLQuery cqlQuery = request
+				.getQuery(CQLQueryParser.CQLQuery.class);
+		
+		String korapQuery = translateCQLtoKorapQuery(cqlQuery.getParsedQuery());
         String version = null;
         if (request.isVersion(SRUVersion.VERSION_1_1)){
         	 version = "1.1";
@@ -155,7 +166,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase{
 		}
 	}
 	
-	private String translateCQLtoKorapQuery(CQLNode query) throws SRUException {		
+	private String translateCQLtoKorapQuery(CQLNode query) throws SRUException {
 		String queryStr = query.toString();
 		if ((queryStr == null) || queryStr.isEmpty()) {
             throw new SRUException(SRUConstants.SRU_EMPTY_TERM_UNSUPPORTED,
@@ -194,5 +205,6 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase{
 		}
 		return korapEndpointDescription.getDefaultDataView();
 	}
+
 		
 }

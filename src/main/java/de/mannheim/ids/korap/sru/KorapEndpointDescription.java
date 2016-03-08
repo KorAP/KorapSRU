@@ -16,13 +16,13 @@ import eu.clarin.sru.server.SRUException;
 import eu.clarin.sru.server.fcs.DataView;
 import eu.clarin.sru.server.fcs.DataView.DeliveryPolicy;
 import eu.clarin.sru.server.fcs.EndpointDescription;
+import eu.clarin.sru.server.fcs.Layer;
 import eu.clarin.sru.server.fcs.ResourceInfo;
 
 public class KorapEndpointDescription implements EndpointDescription {
 
 	private List<DataView> dataviews;
 	private List<URI> capabilities;
-
 	private List<String> languages;
 	
 	private String defaultDataview = "hits";
@@ -90,7 +90,7 @@ public class KorapEndpointDescription implements EndpointDescription {
 
 			ResourceInfo ri = new ResourceInfo(r.get("id").asText(), title,
 					description, KorapSRU.KORAP_WEB_URL, languages, dataviews,
-					null);
+					this.getSupportedLayers(), null);
 			resourceList.add(ri);
 		}
 		
@@ -103,6 +103,11 @@ public class KorapEndpointDescription implements EndpointDescription {
 
 	public void setDefaultDataView(String defaultDataview) {
 		this.defaultDataview = defaultDataview;
+	}
+
+	@Override
+	public List<Layer> getSupportedLayers() {
+		return null;
 	}
 
 }

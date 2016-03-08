@@ -10,9 +10,9 @@
     </databaseInfo>
     
     <indexInfo>
-        <set name="fcs" identifier="clarin.eu/fcs/1.0">
-            <title xml:lang="de">CLARIN Content Search</title>
-            <title xml:lang="en" primary="true">CLARIN Content Search</title>
+        <set name="fcs" identifier="http://clarin.eu/fcs/resource">
+            <title xml:lang="de">CLARIN Federated Content Search</title>
+            <title xml:lang="en" primary="true">CLARIN Federated Content Search</title>
         </set>
         <index search="true" scan="false" sort="false">
             <title xml:lang="en" primary="true">Words</title>
@@ -23,9 +23,9 @@
     </indexInfo>
     
     <schemaInfo>
-        <schema identifier="http://clarin.eu/fcs/1.0" name="fcs"
+        <schema identifier="http://clarin.eu/fcs/resource" name="fcs"
                 sort="false" retrieve="true">
-            <title xml:lang="en" primary="true">CLARIN Content Search</title>
+            <title xml:lang="en" primary="true">CLARIN Federated Content Search</title>
         </schema>
     </schemaInfo>
 
