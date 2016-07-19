@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class KorapClient {
 	
 	private static final String SERVICE_URI = "http://10.0.10.13:7070/api/v0.1/";
-	private String QUERY_LANGUAGE = "CQL";
 	private String CONTEXT_TYPE = "sentence";
 	
 	private int defaultNumOfRecords = 10;
@@ -87,9 +86,9 @@ public class KorapClient {
 	}
 	
 	
-	public KorapResult query(String query, String version, int startRecord, 
-			int maximumRecords, String[] corpora) throws HttpResponseException,
-			IOException {
+	public KorapResult query(String query, QueryLanguage queryLanguage,
+			String version, int startRecord, int maximumRecords,
+			String[] corpora) throws HttpResponseException, IOException {
 		
 		checkQuery(query, startRecord, maximumRecords);
 		
@@ -118,7 +117,8 @@ public class KorapClient {
 		else {*/
 		
 			try {
-				httpRequest = createRequest(query, version, startRecord-1, 
+			httpRequest = createRequest(query, queryLanguage, version,
+					startRecord - 1,
 						maximumRecords);
 			} catch (URISyntaxException e) {
 				throw new IOException("Failed creating http request.");
@@ -163,15 +163,26 @@ public class KorapClient {
 			throws IOException{
 		InputStream is = response.getEntity().getContent(); 
 		JsonNode node = objectMapper.readTree(is);
-		String message = node.get("error").textValue();						
-		String[] errorItems = message.split(":",2);
-		errorItems[0] = errorItems[0].replace("SRU diagnostic ", "");
-		errorItems[1] = errorItems[1].trim();
+		String message = node.get("error").textValue();
+		String[] errorItems;
+		if (message.contains("SRU diagnostic")) {
+			errorItems = message.split(":", 2);
+			errorItems[0] = errorItems[0].replace("SRU diagnostic ", "");
+			errorItems[1] = errorItems[1].trim();
+		}
+		else if (message.contains("not a supported query language")){
+			errorItems = new String[]{"4",
+					"KorAP does not support the query language."};
+		}
+		else {
+			errorItems = new String[]{"1", message};
+		}
+		
 		return errorItems;						
 	}
 	
-	private HttpGet createRequest(String query, String version, int startRecord, 
-			int maximumRecords) 
+	private HttpGet createRequest(String query, QueryLanguage queryLanguage,
+			String version, int startRecord, int maximumRecords)
 			throws URISyntaxException {
 
 		if (maximumRecords <= 0) {
@@ -184,7 +195,7 @@ public class KorapClient {
 		
 		List<NameValuePair> params = new ArrayList<NameValuePair>(); 
 		params.add(new BasicNameValuePair("q", query));
-		params.add(new BasicNameValuePair("ql", QUERY_LANGUAGE));
+		params.add(new BasicNameValuePair("ql", queryLanguage.toString()));
 		params.add(new BasicNameValuePair("v", version));
 		params.add(new BasicNameValuePair("context", CONTEXT_TYPE));
 		params.add(new BasicNameValuePair("count", String.valueOf(maximumRecords)));

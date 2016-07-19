@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.mannheim.ids.korap.sru.KorapClient;
 import de.mannheim.ids.korap.sru.KorapResult;
+import de.mannheim.ids.korap.sru.QueryLanguage;
 
 
 public class KorapClientTest {
@@ -16,7 +17,8 @@ public class KorapClientTest {
 		KorapClient c = new KorapClient(25,50);
 		
 //		prox Kuh
-		KorapResult result = c.query("Haus", "1.2", 1, 5, null);
+		KorapResult result = c.query("Haus", QueryLanguage.CQL, "1.2", 1, 5,
+				null);
 		//System.out.println(result.getMatches().size());
 		
 	}
