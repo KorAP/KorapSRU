@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file has the same format as the XML serialization of endpoint
+    description from the CLARIN-FCS specification.
+-->
+<EndpointDescription xmlns="http://clarin.eu/fcs/endpoint-description"
+    version="2">
+    <Capabilities>
+        <Capability>http://clarin.eu/fcs/capability/basic-search</Capability>
+        <Capability>http://clarin.eu/fcs/capability/advanced-search</Capability>
+    </Capabilities>
+    <SupportedDataViews>
+        <SupportedDataView id="hits" delivery-policy="send-by-default">application/x-clarin-fcs-hits+xml</SupportedDataView>
+        <SupportedDataView id="adv" delivery-policy="send-by-default">application/x-clarin-fcs-adv+xml</SupportedDataView>
+        <SupportedDataView id="kwic" delivery-policy="need-to-request">application/x-clarin-fcs-kwic+xml</SupportedDataView>
+    </SupportedDataViews>
+    <SupportedLayers>
+        <SupportedLayer id="l1" result-id="http://clarin.ids-mannheim.de/korapsru/layers/text">text</SupportedLayer>
+        <SupportedLayer id="l2" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos1" qualifier="cnx"
+        	alt-value-info="based on STTS tagset"
+        	alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
+        <SupportedLayer id="l3" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos2" qualifier="tt"
+            alt-value-info="based on STTS tagset"
+            alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
+        <SupportedLayer id="l4" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos3" qualifier="opennlp"
+            alt-value-info="based on STTS tagset"
+            alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
+       <SupportedLayer id="l5" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos4" qualifier="mate"
+            alt-value-info="based on STTS tagset"
+            alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>        
+        <SupportedLayer id="l6" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos5" qualifier="xip"
+            alt-value-info="based on STTS tagset"
+            alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>       
+        <SupportedLayer id="l7" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma1" qualifier="cnx">lemma</SupportedLayer>
+        <SupportedLayer id="l8" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma2" qualifier="tt">lemma</SupportedLayer>
+        <SupportedLayer id="l9" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma3" qualifier="mate">lemma</SupportedLayer>
+        <SupportedLayer id="l10" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma4" qualifier="xip">lemma</SupportedLayer>
+    </SupportedLayers>
+    <Resources>
+     	<Resource pid="dummy pid">
+           <Title xml:lang="en">dummy resource</Title>
+           <Languages>
+               <Language>deu</Language>
+           </Languages>
+           <AvailableDataViews ref="hits"/>
+        </Resource>
+    </Resources>
+</EndpointDescription>

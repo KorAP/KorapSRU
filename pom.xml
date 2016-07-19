@@ -72,6 +72,7 @@
   <repositories>
     <repository>
       <id>CLARIN</id>
+      <name>CLARIN Repository</name>
       <url>https://nexus.clarin.eu/content/repositories/Clarin</url>
       <!-- <url>http://catalog.clarin.eu/ds/nexus/content/repositories/Clarin/</url> -->
       <layout>default</layout>
