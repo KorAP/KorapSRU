@@ -1,6 +1,7 @@
 package de.mannheim.ids.korap.sru;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -80,10 +81,12 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 
 		checkRequestRecordSchema(request);
 
-		String dataview = korapEndpointDescription.getDefaultDataView();
+		List<String> dataviews = korapEndpointDescription.getDefaultDataViews();
 		if (request.getExtraRequestDataNames().contains("x-fcs-dataviews")) {
-			dataview = getRequestDataView(
-					request.getExtraRequestData("x-fcs-dataviews"), diagnostics);
+		    String extraDataview =  getRequestDataView(
+                    request.getExtraRequestData("x-fcs-dataviews"), diagnostics);
+		    if (extraDataview!=null)
+			dataviews.add(extraDataview);
 		}
 
 		String queryType = request.getQueryType();
@@ -161,7 +164,8 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 					e.getMessage());
 		}
 
-		return new KorapSRUSearchResultSet(diagnostics, korapResult, dataview);
+		return new KorapSRUSearchResultSet(diagnostics, korapResult, dataviews,
+		        korapEndpointDescription);
 	}
 
 	private String[] getCorporaList(SRURequest request) {
@@ -204,10 +208,10 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 			diagnostics.addDiagnostic(
 					Constants.FCS_DIAGNOSTIC_REQUESTED_DATA_VIEW_INVALID,
 					"The requested Data View " + requestDataview
-							+ " is not supported.", "The default Data View "
-							+ korapEndpointDescription.getDefaultDataView()
-							+ " is used.");
+							+ " is not supported.", "Using the default Data View(s): "
+							+ korapEndpointDescription.getDefaultDataViews()
+							+ " .");
 		}
-		return korapEndpointDescription.getDefaultDataView();
+		return null;
 	}
 }
