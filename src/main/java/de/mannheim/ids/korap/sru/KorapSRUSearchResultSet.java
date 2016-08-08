@@ -36,7 +36,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     private List<String> dataviews;
     private KorapEndpointDescription endpointDescription;
     private SAXParser saxParser;
-    
+
     Layer textLayer;
 
     public KorapSRUSearchResultSet (SRUDiagnosticList diagnostics,
@@ -50,7 +50,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
             saxParser = saxParserFactory.newSAXParser();
         }
         catch (ParserConfigurationException | SAXException e) {
-            throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,e);
+            throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR, e);
         }
 
         this.korapResult = korapResult;
@@ -82,25 +82,21 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
     @Override
     public String getRecordIdentifier() {
-        return korapResult.getMatch(i).getID();
+        return korapResult.getMatch(i).getMatchId();
     }
 
     @Override
     public void writeRecord(XMLStreamWriter writer) throws XMLStreamException {
         KorapMatch match;
         match = parseMatch();
-        match.setPositionID();
+        match.parseMatchId();
 
-        XMLStreamWriterHelper.writeStartResource(writer, match.getID(), null);
+        XMLStreamWriterHelper.writeStartResource(writer, match.getMatchId(),
+                null);
         XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
 
         List<AnnotationLayer> annotationLayers;
-        try {
-            annotationLayers = parseAnnotations(match);
-        }
-        catch (SRUException e) {
-            throw new XMLStreamException(e);
-        }
+        annotationLayers = parseAnnotations(match);
 
         writeAdvancedDataView(writer, annotationLayers);
 
@@ -122,34 +118,23 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     }
 
     private List<AnnotationLayer> parseAnnotations(KorapMatch match)
-            throws SRUException {
-        String annotationSnippet;
-        AnnotationHandler annotationHandler = new AnnotationHandler(endpointDescription.getAnnotationLayers());
-        InputStream is;
-
+            throws XMLStreamException {
+        AnnotationHandler annotationHandler = new AnnotationHandler(
+                endpointDescription.getAnnotationLayers());
         try {
-            annotationSnippet = KorapClient.retrieveAnnotations(match);
-        }
-        catch (IOException e) {
-            throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
-                    e);
-        }
-
-        is = new ByteArrayInputStream(annotationSnippet.getBytes());
-        
-        try {
+            String annotationSnippet = KorapClient.retrieveAnnotations(match);
+            InputStream is = new ByteArrayInputStream(annotationSnippet.getBytes());
             saxParser.parse(is, annotationHandler);
         }
         catch (SAXException | IOException e) {
-            throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR, e);
+            throw new XMLStreamException(e);
         }
-        
+
         return annotationHandler.getAnnotationLayers();
     }
 
     private void writeAdvancedDataView(XMLStreamWriter writer,
-            List<AnnotationLayer> annotationLayers)
-            throws XMLStreamException {
+            List<AnnotationLayer> annotationLayers) throws XMLStreamException {
 
         AdvancedDataViewWriter helper = new AdvancedDataViewWriter(
                 AdvancedDataViewWriter.Unit.ITEM);
@@ -161,18 +146,13 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         if (dataviews.contains("adv")) {
             helper.writeAdvancedDataView(writer);
         }
-
     }
-    
+
     private void addAnnotationsToWriter(AdvancedDataViewWriter helper,
             List<AnnotationLayer> annotationLayers) {
-        
-        boolean isKeywordAktive = false; 
-        String keyword = "";
-        long start=0,end=0; 
-        
-        Map<Integer,List<Annotation>> map;
-        for (AnnotationLayer annotationLayer : annotationLayers) {        
+
+        Map<Integer, List<Annotation>> map;
+        for (AnnotationLayer annotationLayer : annotationLayers) {
             map = annotationLayer.getAnnotationMap();
             Set<Integer> keyset = map.keySet();
             Integer[] keyArray = keyset.toArray(new Integer[keyset.size()]);
@@ -185,33 +165,27 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
                 // FCS advanced dataview does not allow multiple
                 // annotations on the same segment.
-                // for (Annotation annotation : annotations){                
+                // for (Annotation annotation : annotations){
                 Annotation annotation = annotations.get(0);
-                
-                if (annotation.isKeyword()) {
-                    if (!isKeywordAktive){ 
-                        isKeywordAktive = true;
-                        start = annotation.getStart();                        
-                    }
-                    end = annotation.getEnd();
-                    keyword += annotation.getValue();
-//                    helper.addSpan(annotationLayer.getLayerId(),
-//                            annotation.getStart(), annotation.getEnd(),
-//                            annotation.getValue(), 1);
+
+                // if
+                // (annotationLayer.getLayerCode().equals(AnnotationLayer.TYPE.TEXT.toString())){
+                // logger.info(annotation.getStart()+" "+
+                // annotation.getEnd()+" "+
+                // annotation.getValue());
+                // }
+                if (annotation.getHitLevel()>0) {
+                    helper.addSpan(annotationLayer.getLayerId(),
+                            annotation.getStart(), annotation.getEnd(),
+                            annotation.getValue(), annotation.getHitLevel());
                 }
                 else {
-                    if (isKeywordAktive && annotationLayer.getLayerCode().equals(AnnotationLayer.TYPE.TEXT.toString())){
-                        helper.addSpan(annotationLayer.getLayerId(),
-                              start, end,
-                              keyword, 1);
-                        isKeywordAktive = false;
-                    }
                     helper.addSpan(annotationLayer.getLayerId(),
                             annotation.getStart(), annotation.getEnd(),
                             annotation.getValue());
                 }
-                // }
             }
+            map.clear();
         }
     }
 }

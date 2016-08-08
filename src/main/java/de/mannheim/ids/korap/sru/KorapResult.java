@@ -9,20 +9,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class KorapResult {
 	private int totalResults;
 	private List<KorapMatch> matches;
+	private List<List<Object>> errors;
 	
 	public KorapResult() {
 		matches = new ArrayList<KorapMatch>();
 	}
-	
-	public int getTotalResults() {
+			
+	public List<List<Object>> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<List<Object>> errors) {
+        this.errors = errors;
+    }
+
+    public int getTotalResults() {
 		return totalResults;
 	}
-	public List<KorapMatch> getMatches() {
-		return matches;
-	}
+	
 	public void setTotalResults(int totalResults) {
 		this.totalResults = totalResults;
 	}
+	
+	public List<KorapMatch> getMatches() {
+        return matches;
+    }
+	
 	public void setMatches(List<KorapMatch> matches) {
 		this.matches = matches;
 	}
@@ -37,4 +49,6 @@ public class KorapResult {
 	public int getMatchSize(){
 		return matches.size();
 	}
+	
+	
 }

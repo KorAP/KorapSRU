@@ -28,7 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KorapClient {
 
-    private static final String SERVICE_URI = "http://10.0.10.13:7070/api/v0.1/";
+    private static final String SERVICE_URI = "http://localhost:8089/api/v0.1/"; 
+            //"http://10.0.10.13:7070/api/v0.1/";
     private String CONTEXT_TYPE = "sentence";
 
     private int defaultNumOfRecords = 10;
@@ -130,12 +131,7 @@ public class KorapClient {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
                 logger.warn("Error response code: " + statusCode);
-                logger.warn("Error message: "
-                        + response.getStatusLine().getReasonPhrase());
-                String[] errorMsg = parseError(response);
-                logger.warn(errorMsg[0] + "#" + errorMsg[1]);
-                throw new HttpResponseException(Integer.parseInt(errorMsg[0]),
-                        errorMsg[1]);
+                parseError(response);
             }
             
             BufferedInputStream jsonStream = new BufferedInputStream(response
@@ -157,8 +153,12 @@ public class KorapClient {
         return result;
     }
 
-    private static String[] parseError(CloseableHttpResponse response)
+    private static void parseError(CloseableHttpResponse response)
             throws IOException {
+        
+        logger.warn("Error message: "
+                + response.getStatusLine().getReasonPhrase());
+        
         InputStream is = response.getEntity().getContent();
         JsonNode node = objectMapper.readTree(is);
         String message = node.get("error").textValue();
@@ -175,8 +175,9 @@ public class KorapClient {
         else {
             errorItems = new String[] { "1", message };
         }
-
-        return errorItems;
+        
+        throw new HttpResponseException(Integer.parseInt(errorItems[0]),
+                errorItems[1]);
     }
 
     private HttpGet createSearchRequest(String query,
@@ -228,7 +229,7 @@ public class KorapClient {
     public static String retrieveAnnotations(KorapMatch match) throws IOException {
         HttpUriRequest httpRequest;
         try {
-            httpRequest = createMatchInfoRequest(match.getCorpusID(), match.getDocID(), match.getPositionID(), "*");
+            httpRequest = createMatchInfoRequest(match.getCorpusId(), match.getDocId(), match.getPositionId(), "*");
         }
         catch (URISyntaxException e) {
             throw new IOException("Failed creating http request for retrieving annotations.");
@@ -244,12 +245,7 @@ public class KorapClient {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
                 logger.warn("Error response code: " + statusCode);
-                logger.warn("Error message: "
-                        + response.getStatusLine().getReasonPhrase());
-                String[] errorMsg = parseError(response);
-                logger.warn(errorMsg[0] + "#" + errorMsg[1]);
-                throw new HttpResponseException(Integer.parseInt(errorMsg[0]),
-                        errorMsg[1]);
+                parseError(response);
             }
 
             BufferedInputStream jsonStream = new BufferedInputStream(response
@@ -274,6 +270,8 @@ public class KorapClient {
     private static HttpGet createMatchInfoRequest(String resourceId,
             String documentId, String matchId, String foundry) throws URISyntaxException {
         StringBuilder sb = new StringBuilder();
+        sb.append(SERVICE_URI);
+//        sb.append("http://localhost:8089/api/v0.1/");
         sb.append("corpus/");
         sb.append(resourceId);
         sb.append("/");
@@ -284,11 +282,10 @@ public class KorapClient {
         sb.append(foundry);
         sb.append("&spans=false");
 
-        URIBuilder builder = new URIBuilder(SERVICE_URI + sb.toString());
+        URIBuilder builder = new URIBuilder(sb.toString());
         URI uri = builder.build();
-        logger.info("Query URI: " + uri.toString());
+        logger.info("MatchInfo URI: " + uri.toString());
         HttpGet request = new HttpGet(uri);
         return request;
-
     }
 }
