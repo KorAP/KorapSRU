@@ -2,6 +2,8 @@ package de.mannheim.ids.korap.sru;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,10 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KorapMatch {
 
-    private String ID;
-    private String positionID;
-    private String docID;
-    private String corpusID;
+    private String matchID;
+    private String positionId;
+    private String docId;
+    private String corpusId;
     private String leftContext;
     private String keyword;
     private String rightContext;
@@ -20,41 +22,51 @@ public class KorapMatch {
     private String text;
 
     private List<AnnotationLayer> annotationLayers = new ArrayList<AnnotationLayer>();
+    
+    private static Pattern idPattern = Pattern.compile("match-(.*)_(.*)-p([0-9]+-[0-9]+)");
 
     public KorapMatch () {}
-
-    @JsonProperty("ID")
-    public String getID() {
-        return ID;
+    
+    @JsonProperty("matchID")
+    public String getMatchId() {
+        return matchID;
     }
 
-    public void setID(String id) {
-        this.ID = id;
+    public void setMatchId(String id) {
+        this.matchID = id;
+    }
+   
+    public void parseMatchId(){
+        Matcher matcher = idPattern.matcher(matchID);
+        if (matcher.find()){
+            this.corpusId = matcher.group(1);
+            this.docId = matcher.group(2);
+            this.positionId = "p"+matcher.group(3);
+        }
+    } 
+    
+    public void setPositionId(String positionId) {
+        this.positionId = positionId;
     }
 
-    public void setPositionID() {
-        String[] idParts = ID.split("-");
-        this.positionID = idParts[2] + "-" + idParts[3];
+    public String getPositionId() {
+        return positionId;
     }
 
-    public String getPositionID() {
-        return positionID;
+    public String getDocId() {
+        return docId;
     }
 
-    public String getDocID() {
-        return docID;
+    public void setDocId(String docID) {
+        this.docId = docID.replace(corpusId + "_", "");
     }
 
-    public void setDocID(String docID) {
-        this.docID = docID.replace(corpusID + "_", "");
+    public String getCorpusId() {
+        return corpusId;
     }
 
-    public String getCorpusID() {
-        return corpusID;
-    }
-
-    public void setCorpusID(String corpusID) {
-        this.corpusID = corpusID;
+    public void setCorpusId(String corpusId) {
+        this.corpusId = corpusId;
     }
 
     public String getLeftContext() {
