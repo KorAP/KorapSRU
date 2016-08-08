@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.core.IsSame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -17,6 +16,7 @@ public class AnnotationHandler extends DefaultHandler {
             .getLogger(AnnotationHandler.class);
 
     private boolean startSegment = true;
+    private boolean startSentence = false;
 
     private int matchLevel = 0;
 
@@ -41,24 +41,30 @@ public class AnnotationHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
 
-        if (qName.equals("mark")) {
-            text = textBuilder.toString();
-            textBuilder = new StringBuilder();
-            if (!text.isEmpty()) {
-                addAnnotationToMap(text, annotationLayers.get(0),
-                        (matchLevel > 1), textStartOffset, textEndOffset);
-                textStartOffset = textEndOffset;
-            }
-            matchLevel++;
-        }
-        if (matchLevel > 0 && qName.equals("span")
-                && attributes.getQName(0).equals("title")) {
+        if (startSentence && attributes.getValue("title") != null && qName.equals("span")) {
             if (startSegment) {
                 segmentStartOffset = segmentEndOffset;
                 startSegment = false;
             }
             annotationStrings.add(attributes.getValue("title"));
-
+        }
+        else if (attributes.getValue("class") !=null && qName.equals("span")){            
+            if (attributes.getValue("class").equals("match")){
+                startSentence = true;
+            }
+            else {
+                startSentence = false;
+            }
+        }
+        else if (qName.equals("mark")) {
+            text = textBuilder.toString();            
+            textBuilder = new StringBuilder();
+            if (!text.isEmpty()) {
+                addAnnotationToMap(text, annotationLayers.get(0),
+                        matchLevel, textStartOffset, textEndOffset);
+                textStartOffset = textEndOffset;
+            }
+            matchLevel++;
         }
         super.startElement(uri, localName, qName, attributes);
 
@@ -79,22 +85,22 @@ public class AnnotationHandler extends DefaultHandler {
                 segmentBuilder = new StringBuilder();
             }
             else if (annotationLayer.getLayerCode().equals(layerCode)) {
-                addAnnotationToMap(value, annotationLayer, false);
+                addAnnotationToMap(value, annotationLayer, 0);
                 break;
             }
         }
     }
 
     private void addAnnotationToMap(String value,
-            AnnotationLayer annotationLayer, boolean isKeyword) {
-        addAnnotationToMap(value, annotationLayer, isKeyword, segmentStartOffset, segmentEndOffset);
+            AnnotationLayer annotationLayer, int hitLevel) {
+        addAnnotationToMap(value, annotationLayer, hitLevel, segmentStartOffset, segmentEndOffset);
     }
     
     private void addAnnotationToMap(String value,
-            AnnotationLayer annotationLayer, boolean isKeyword, long startOffset, long endOffset) {
+            AnnotationLayer annotationLayer, int hitLevel, long startOffset, long endOffset) {
 
         Annotation annotation = new Annotation(id, value, startOffset,
-                endOffset, isKeyword);
+                endOffset, hitLevel);
 
         Map<Integer, List<Annotation>> map = annotationLayer.getAnnotationMap();
 
@@ -114,18 +120,14 @@ public class AnnotationHandler extends DefaultHandler {
 
         if (qName.equals("mark")) {
 
-            annotationLayers.get(0);
-
             text = textBuilder.toString();
             textBuilder = new StringBuilder();
-
             addAnnotationToMap(text, annotationLayers.get(0),
-                    (matchLevel > 1), textStartOffset, textEndOffset);
+                    matchLevel, textStartOffset, textEndOffset);
             textStartOffset = textEndOffset;
-            
             matchLevel--;
         }
-        else if (!startSegment) {
+        else if (!startSegment && qName.equals("span")) {
             for (String annotationStr : annotationStrings) {
                 parseAnnotation(annotationStr);
             }
@@ -133,6 +135,13 @@ public class AnnotationHandler extends DefaultHandler {
             startSegment = true;
             annotationStrings.clear();
         }
+    }
+    
+    @Override
+    public void endDocument() throws SAXException {
+        text = textBuilder.toString();
+        addAnnotationToMap(text, annotationLayers.get(0),
+                matchLevel, textStartOffset, textEndOffset);
     }
 
     @Override

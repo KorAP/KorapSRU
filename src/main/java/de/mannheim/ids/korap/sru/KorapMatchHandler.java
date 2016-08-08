@@ -6,7 +6,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class KorapMatchHandler extends DefaultHandler{
 	
-	KorapMatch match;
+	private KorapMatch match;
 	boolean isLeftContext, isRightContext, isKeyword, isMore;
 	private StringBuilder sbLeft, sbRight, sbKey;
 	 

@@ -1,6 +1,6 @@
 package de.mannheim.ids.korap.sru;
 
-/**
+/** 
  * @author margaretha
  *
  */
@@ -10,14 +10,14 @@ public class Annotation {
     private long start;
     private long end;
     private String value;
-    private boolean isKeyword;
-
-    public Annotation (int id, String value, long start, long end, boolean isKeyword) {
+    private int hitLevel;
+    
+    public Annotation (int id, String value, long start, long end, int hitLevel) {
         this.id = id;
         this.value = value;
         this.start = start;
         this.end = end;
-        this.isKeyword = isKeyword;
+        this.hitLevel = hitLevel;
     }
 
     public int getId() {
@@ -52,11 +52,11 @@ public class Annotation {
         this.value = value;
     }
 
-    public boolean isKeyword() {
-        return isKeyword;
+    public int getHitLevel() {
+        return hitLevel;
     }
-
-    public void setKeyword(boolean isKeyword) {
-        this.isKeyword = isKeyword;
+    
+    public void setHitLevel(int hitLevel) {
+        this.hitLevel = hitLevel;
     }
 }
