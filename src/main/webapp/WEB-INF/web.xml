@@ -10,10 +10,6 @@
     <display-name>KorAP SRU/CQL Service (HTTP Interface)</display-name>
     <servlet-name>KorapSRU</servlet-name>
     <servlet-class>eu.clarin.sru.server.utils.SRUServerServlet</servlet-class>
-    <!-- <init-param>
-        <param-name>de.mannheim.ids.korap.sru.indexDir</param-name>
-        <param-value>/usr/local/java/apps/korapsru/index</param-value>
-    </init-param>     -->
     <init-param>
         <param-name>eu.clarin.sru.server.numberOfRecords</param-name>
         <param-value>25</param-value>

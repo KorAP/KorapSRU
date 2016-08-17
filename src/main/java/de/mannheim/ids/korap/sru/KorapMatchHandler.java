@@ -4,6 +4,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/** Handler for parsing the match snippet from KorAP search API. 
+ *  
+ * @author margaretha
+ *
+ */
 public class KorapMatchHandler extends DefaultHandler{
 	
 	private KorapMatch match;
