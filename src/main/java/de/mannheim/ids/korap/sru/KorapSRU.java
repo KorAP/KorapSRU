@@ -18,12 +18,16 @@ import eu.clarin.sru.server.SRUQueryParserRegistry;
 import eu.clarin.sru.server.SRURequest;
 import eu.clarin.sru.server.SRUSearchResultSet;
 import eu.clarin.sru.server.SRUServerConfig;
+import eu.clarin.sru.server.SRUVersion;
 import eu.clarin.sru.server.fcs.Constants;
 import eu.clarin.sru.server.fcs.DataView;
 import eu.clarin.sru.server.fcs.EndpointDescription;
 import eu.clarin.sru.server.fcs.SimpleEndpointSearchEngineBase;
 
 /**
+ * KorAP search engine endpoint implementation supporting SRU calls
+ * with operation explain and search retrieve.
+ * 
  * @author margaretha
  * */
 public class KorapSRU extends SimpleEndpointSearchEngineBase {
@@ -34,7 +38,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
     public static String redirectBaseURI;
     public static KorapClient korapClient;
     private KorapEndpointDescription korapEndpointDescription;
-    private SRUServerConfig serverConfig;
+    // private SRUServerConfig serverConfig;
 
     private Logger logger = (Logger) LoggerFactory.getLogger(KorapSRU.class);
 
@@ -50,7 +54,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
     protected void doInit(ServletContext context, SRUServerConfig config,
             SRUQueryParserRegistry.Builder parserRegistryBuilder,
             Map<String, String> params) throws SRUConfigException {
-        serverConfig = config;
+        // serverConfig = config;
         korapClient = new KorapClient(config.getNumberOfRecords(),
                 config.getMaximumRecords());
 
@@ -73,28 +77,53 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 
         checkRequestRecordSchema(request);
 
-        List<String> dataviews = korapEndpointDescription.getDefaultDataViews();
-        if (request.getExtraRequestDataNames().contains("x-fcs-dataviews")) {
-            String extraDataview = getRequestDataView(
-                    request.getExtraRequestData("x-fcs-dataviews"), diagnostics);
-            if (extraDataview != null) dataviews.add(extraDataview);
-        }
+        List<String> dataviews = createRequestDataview(request, diagnostics);
+        QueryLanguage queryLanguage = parseQueryLanguage(request);
 
-        boolean isRewitesAllowed = false;
-        if (request.getExtraRequestDataNames().contains("x-fcs-rewrites-allowed")) {
-             isRewitesAllowed = getRequestDataView(
-                    request.getExtraRequestData("x-fcs-rewrites-allowed"), diagnostics).
-                    equals("true");
-        }
-        
         String queryType = request.getQueryType();
         logger.info("Query language: " + queryType);
-        QueryLanguage queryLanguage;
+
+        String queryStr = request.getQuery().getRawQuery();
+        if ((queryStr == null) || queryStr.isEmpty()) {
+            throw new SRUException(SRUConstants.SRU_EMPTY_TERM_UNSUPPORTED,
+                    "An empty term is not supported.");
+        }
+        logger.info("korapsru query: " + queryStr);
+
+        String version = parseVersion(request.getVersion());
+
+        KorapResult korapResult = sendQuery(queryStr, request, version,
+                queryLanguage);
+        checkKorapResultError(korapResult, queryLanguage,
+                isRewitesAllowed(request), diagnostics);
+
+        return new KorapSRUSearchResultSet(diagnostics, korapResult, dataviews,
+                korapEndpointDescription.getTextLayer(),
+                korapEndpointDescription.getAnnotationLayers());
+    }
+
+    private String parseVersion(SRUVersion version) throws SRUException {
+        if (version == SRUVersion.VERSION_1_1) {
+            return "1.1";
+        }
+        else if (version == SRUVersion.VERSION_1_2) {
+            return "1.2";
+        }
+        else if (version == SRUVersion.VERSION_2_0) {
+            return "2.0";
+        }
+        else {
+            throw new SRUException(SRUConstants.SRU_UNSUPPORTED_VERSION);
+        }
+    }
+
+    private QueryLanguage parseQueryLanguage(SRURequest request)
+            throws SRUException {
         if (request.isQueryType(Constants.FCS_QUERY_TYPE_CQL)) {
-            queryLanguage = QueryLanguage.CQL;
+            return QueryLanguage.CQL;
         }
         else if (request.isQueryType(Constants.FCS_QUERY_TYPE_FCS)) {
-            queryLanguage = QueryLanguage.FCSQL;
+            return QueryLanguage.FCSQL;
         }
         else {
             throw new SRUException(
@@ -103,30 +132,55 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                             + request.getQueryType()
                             + "' are not supported by this CLARIN-FCS Endpoint.");
         }
+    }
 
-        String queryStr = null;
-        queryStr = request.getQuery().getRawQuery();
-        if ((queryStr == null) || queryStr.isEmpty()) {
-            throw new SRUException(SRUConstants.SRU_EMPTY_TERM_UNSUPPORTED,
-                    "An empty term is not supported.");
+    private boolean isRewitesAllowed(SRURequest request) {
+        if (request.getExtraRequestDataNames().contains(
+                "x-fcs-rewrites-allowed")) {
+
+            String rewrites = request
+                    .getExtraRequestData("x-fcs-rewrites-allowed");
+            if (rewrites != null && !rewrites.isEmpty()) {
+
+                if (rewrites.equals("true")) return true;
+            }
         }
-        logger.info("korapsru query: " + queryStr);
+        return false;
+    }
 
-        String version = null;
-        switch (request.getVersion()) {
-            case VERSION_1_1:
-                version = "1.1";
-            case VERSION_1_2:
-                version = "1.2";
-            case VERSION_2_0:
-                version = "2.0";
-            default:
-                serverConfig.getDefaultVersion();
+    private List<String> createRequestDataview(SRURequest request,
+            SRUDiagnosticList diagnostics) {
+
+        List<String> dataviews = korapEndpointDescription.getDefaultDataViews();
+
+        if (request.getExtraRequestDataNames().contains("x-fcs-dataviews")) {
+            String requestDataview = request
+                    .getExtraRequestData("x-fcs-dataviews");
+            if (requestDataview != null & !requestDataview.isEmpty()) {
+                for (DataView dv : korapEndpointDescription
+                        .getSupportedDataViews()) {
+                    if (dv.getIdentifier().equals(requestDataview)) {
+                        dataviews.add(requestDataview);
+                    }
+                }
+                diagnostics.addDiagnostic(
+                        Constants.FCS_DIAGNOSTIC_REQUESTED_DATA_VIEW_INVALID,
+                        "The requested Data View " + requestDataview
+                                + " is not supported.",
+                        "Using the default Data View(s): "
+                                + korapEndpointDescription
+                                        .getDefaultDataViews() + " .");
+            }
         }
 
-        KorapResult korapResult = new KorapResult();
+        return dataviews;
+    }
+
+    private KorapResult sendQuery(String queryStr, SRURequest request,
+            String version, QueryLanguage queryLanguage) throws SRUException {
+
         try {
-            korapResult = korapClient.query(queryStr, queryLanguage, version,
+            return korapClient.query(queryStr, queryLanguage, version,
                     request.getStartRecord(), request.getMaximumRecords(),
                     getCorporaList(request));
         }
@@ -164,7 +218,11 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
             throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
                     e.getMessage());
         }
+    }
 
+    private void checkKorapResultError(KorapResult korapResult,
+            QueryLanguage queryLanguage, boolean isRewitesAllowed,
+            SRUDiagnosticList diagnostics) throws SRUException {
         if (korapResult.getErrors() != null) {
             for (List<Object> error : korapResult.getErrors()) {
                 int errorCode = (int) error.get(0);
@@ -216,13 +274,20 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                                     SRUConstants.SRU_QUERY_SYNTAX_ERROR,
                                     (String) error.get(1));
                         }
+                    case 780:
+                        throw new SRUException(
+                                SRUConstants.SRU_RESULT_SET_NOT_CREATED_TOO_MANY_MATCHING_RECORDS,
+                                (String) error.get(1));
                     case 781:
-                        if (isRewitesAllowed){
-                            diagnostics.addDiagnostic(FCSConstants.FCS_QUERY_REWRITTEN,"",(String) error.get(1));
+                        if (isRewitesAllowed) {
+                            diagnostics.addDiagnostic(
+                                    FCSConstants.FCS_QUERY_REWRITTEN, "",
+                                    (String) error.get(1));
                         }
                         else {
                             throw new SRUException(
-                                    SRUConstants.SRU_RESULT_SET_NOT_CREATED_TOO_MANY_MATCHING_RECORDS);
+                                    SRUConstants.SRU_RESULT_SET_NOT_CREATED_TOO_MANY_MATCHING_RECORDS,
+                                    "Too many matching records.");
                         }
                     default:
                         break;
@@ -230,9 +295,6 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 
             }
         }
-
-        return new KorapSRUSearchResultSet(diagnostics, korapResult, dataviews,
-                korapEndpointDescription);
     }
 
     private String[] getCorporaList(SRURequest request) {
@@ -265,22 +327,4 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
         }
     }
 
-    private String getRequestDataView(String requestDataview,
-            SRUDiagnosticList diagnostics) {
-        if (requestDataview != null & !requestDataview.isEmpty()) {
-            for (DataView dv : korapEndpointDescription.getSupportedDataViews()) {
-                if (dv.getIdentifier().equals(requestDataview)) {
-                    return requestDataview;
-                }
-            }
-            diagnostics.addDiagnostic(
-                    Constants.FCS_DIAGNOSTIC_REQUESTED_DATA_VIEW_INVALID,
-                    "The requested Data View " + requestDataview
-                            + " is not supported.",
-                    "Using the default Data View(s): "
-                            + korapEndpointDescription.getDefaultDataViews()
-                            + " .");
-        }
-        return null;
-    }
 }

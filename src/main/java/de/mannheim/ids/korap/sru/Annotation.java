@@ -1,31 +1,22 @@
 package de.mannheim.ids.korap.sru;
 
 /** 
+ * 
  * @author margaretha
  *
  */
 public class Annotation {
 
-    private int id;
     private long start;
     private long end;
     private String value;
     private int hitLevel;
     
-    public Annotation (int id, String value, long start, long end, int hitLevel) {
-        this.id = id;
+    public Annotation (String value, long start, long end, int hitLevel) {
         this.value = value;
         this.start = start;
         this.end = end;
         this.hitLevel = hitLevel;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public long getStart() {

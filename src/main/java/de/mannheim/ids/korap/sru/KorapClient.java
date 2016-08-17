@@ -26,23 +26,50 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Client to KorAP public services supporting calls to the resource,
+ * search and matchInfo APIs.
+ * 
+ * @author margaretha
+ * 
+ */
 public class KorapClient {
 
-    private static final String SERVICE_URI = "http://localhost:8089/api/v0.1/"; 
-            //"http://10.0.10.13:7070/api/v0.1/";
-    private String CONTEXT_TYPE = "sentence";
+    private static final String SERVICE_URI = "http://localhost:8089/api/v0.1/";
+    // "http://10.0.10.13:7070/api/v0.1/";
+    private static final String DEFAULT_CONTEXT_TYPE = "sentence";
+    private static final String DEFAULT_FOUNDRY = "*";
 
     private int defaultNumOfRecords = 10;
     private int defaultMaxRecords = 10;
 
     private static ObjectMapper objectMapper = new ObjectMapper();
-    private static Logger logger = (Logger) LoggerFactory.getLogger(KorapClient.class);
+    private static Logger logger = (Logger) LoggerFactory
+            .getLogger(KorapClient.class);
 
+    /**
+     * Constructs a KorapClient with the given number of records per
+     * page and the maximum number of records.
+     * 
+     * @param numOfRecords
+     *            the number of records per page
+     * @param maxRecords
+     *            the number of maximum records/matches to retrieve
+     */
     public KorapClient (int numOfRecords, int maxRecords) {
         this.defaultNumOfRecords = numOfRecords;
         this.defaultMaxRecords = maxRecords;
     }
 
+    /**
+     * Gets information about available resources to search through
+     * the KorAP public services.
+     * 
+     * @return a JSON node containing information about the resources
+     * 
+     * @throws URISyntaxException
+     * @throws IOException
+     */
     public JsonNode retrieveResources() throws URISyntaxException, IOException {
 
         URIBuilder builder = new URIBuilder(SERVICE_URI + "VirtualCollection");
@@ -86,33 +113,45 @@ public class KorapClient {
         return resources;
     }
 
+    /**
+     * Sends the given query to KorAP search API and creates a
+     * KorapResult from the response.
+     * 
+     * @param query
+     *            a query string
+     * @param queryLanguage
+     *            the query language
+     * @param version
+     *            the query language version
+     * @param startRecord
+     *            the starting record/match number to retrieve
+     * @param maximumRecords
+     *            the number of maximum records/matches to retrieve
+     * @param corpora
+     *            the corpora to search on
+     * @return a KorapResult
+     * 
+     * @throws HttpResponseException
+     * @throws IOException
+     */
     public KorapResult query(String query, QueryLanguage queryLanguage,
             String version, int startRecord, int maximumRecords,
             String[] corpora) throws HttpResponseException, IOException {
 
-        checkQuery(query, startRecord, maximumRecords);
+        if (query == null) {
+            throw new NullPointerException("Query is null.");
+        }
+        if (query.isEmpty()) {
+            throw new IllegalArgumentException("Query is empty.");
+        }
+        if (startRecord < 1) {
+            throw new IllegalArgumentException("Start record begins from 1.");
+        }
+        if (maximumRecords < 1) {
+            throw new IllegalArgumentException("Maximum records is too low.");
+        }
 
         HttpUriRequest httpRequest = null;
-
-        /*
-         * if (corpora != null){ // create virtual collection
-         * logger.info("Select collection"); CollectionQuery
-         * collectionQuery = new CollectionQuery()
-         * .addMetaFilter("corpusID", DEFAULT_COLLECTION);
-         * 
-         * logger.info("create JsonLD"); QuerySerializer ss = new
-         * QuerySerializer() .setQuery(query, QUERY_LANGUAGE,version)
-         * .setCollection(collectionQuery) .setMeta(CONTEXT_TYPE,
-         * CONTEXT_TYPE, CONTEXT_SIZE, CONTEXT_SIZE, 5,
-         * startRecord-1);
-         * 
-         * String jsonld=ss.build(); logger.info(jsonld);
-         * 
-         * HttpPost post = new HttpPost(SERVICE_URI+"_raw");
-         * post.setEntity(new StringEntity(jsonld)); httpRequest =
-         * post; } else {
-         */
-
         try {
             httpRequest = createSearchRequest(query, queryLanguage, version,
                     startRecord - 1, maximumRecords);
@@ -120,7 +159,6 @@ public class KorapClient {
         catch (URISyntaxException e) {
             throw new IOException("Failed creating http request.");
         }
-        // }
 
         CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response = null;
@@ -133,7 +171,7 @@ public class KorapClient {
                 logger.warn("Error response code: " + statusCode);
                 parseError(response);
             }
-            
+
             BufferedInputStream jsonStream = new BufferedInputStream(response
                     .getEntity().getContent());
             try {
@@ -153,12 +191,19 @@ public class KorapClient {
         return result;
     }
 
+    /**
+     * Parses the error message from Kustvakt (probably an old format).
+     * 
+     * @param response
+     *            a response from Kustvakt
+     * @throws IOException
+     */
     private static void parseError(CloseableHttpResponse response)
             throws IOException {
-        
+
         logger.warn("Error message: "
                 + response.getStatusLine().getReasonPhrase());
-        
+
         InputStream is = response.getEntity().getContent();
         JsonNode node = objectMapper.readTree(is);
         String message = node.get("error").textValue();
@@ -175,11 +220,27 @@ public class KorapClient {
         else {
             errorItems = new String[] { "1", message };
         }
-        
+
         throw new HttpResponseException(Integer.parseInt(errorItems[0]),
                 errorItems[1]);
     }
 
+    /**
+     * Builds a search retrieve GET request for the given parameters.
+     * 
+     * @param query
+     *            a query string
+     * @param queryLanguage
+     *            the query language
+     * @param version
+     *            the query language version
+     * @param startRecord
+     *            the starting number of records/matches to return
+     * @param maximumRecords
+     *            the number of maximum records to return
+     * @return a HttpGet request
+     * @throws URISyntaxException
+     */
     private HttpGet createSearchRequest(String query,
             QueryLanguage queryLanguage, String version, int startRecord,
             int maximumRecords) throws URISyntaxException {
@@ -197,46 +258,77 @@ public class KorapClient {
         params.add(new BasicNameValuePair("q", query));
         params.add(new BasicNameValuePair("ql", queryLanguage.toString()));
         params.add(new BasicNameValuePair("v", version));
-        params.add(new BasicNameValuePair("context", CONTEXT_TYPE));
+        params.add(new BasicNameValuePair("context", DEFAULT_CONTEXT_TYPE));
         params.add(new BasicNameValuePair("count", String
                 .valueOf(maximumRecords)));
         params.add(new BasicNameValuePair("offset", String.valueOf(startRecord)));
 
         URIBuilder builder = new URIBuilder(SERVICE_URI + "search");
         builder.addParameters(params);
+
         URI uri = builder.build();
         logger.info("Query URI: " + uri.toString());
         HttpGet request = new HttpGet(uri);
         return request;
     }
 
-    private void checkQuery(String query, int startRecord, int maxRecord) {
-        if (query == null) {
-            throw new NullPointerException("Query == null.");
-        }
-        if (query.isEmpty()) {
-            throw new IllegalArgumentException("Query is empty.");
-        }
-        if (startRecord < 1) {
-            throw new IllegalArgumentException("Start record begins from 1.");
-        }
-        if (maxRecord < 1) {
-            throw new IllegalArgumentException("Maximum records is too low.");
-        }
-    }
+    /**
+     * Sends a request to the MatchInfo API to get the annotations of
+     * a particular match identified with corpus/resource id, document
+     * id, and position id in the document in one or multiple
+     * foundries.
+     * 
+     * @param resourceId
+     *            the id of the corpus
+     * @param documentId
+     *            the id of the document
+     * @param matchId
+     *            the id of the match
+     * @param foundry
+     *            the annotation layer
+     * @return the annotation snippet
+     * 
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static String retrieveAnnotations(String resourceId,
+            String documentId, String matchId, String foundry)
+            throws IOException, URISyntaxException {
 
-    
-    public static String retrieveAnnotations(KorapMatch match) throws IOException {
+        if (resourceId == null) {
+            throw new NullPointerException("Corpus id of the match is null.");
+        }
+        else if (resourceId.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Corpus id of the match is empty.");
+        }
+
+        if (documentId == null) {
+            throw new NullPointerException("Document id of the match is null.");
+        }
+        else if (documentId.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Document id of the match is empty.");
+        }
+
+        if (matchId == null) {
+            throw new NullPointerException("Position id of the match is null.");
+        }
+        else if (matchId.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Position id of the match is empty.");
+        }
+
+        if (foundry == null | foundry.isEmpty()) {
+            foundry = DEFAULT_FOUNDRY;
+        }
+
         HttpUriRequest httpRequest;
-        try {
-            httpRequest = createMatchInfoRequest(match.getCorpusId(), match.getDocId(), match.getPositionId(), "*");
-        }
-        catch (URISyntaxException e) {
-            throw new IOException("Failed creating http request for retrieving annotations.");
-        }
+        httpRequest = createMatchInfoRequest(resourceId, documentId, matchId,
+                foundry);
 
         String annotationSnippet = null;
-        
+
         CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         try {
@@ -251,11 +343,13 @@ public class KorapClient {
             BufferedInputStream jsonStream = new BufferedInputStream(response
                     .getEntity().getContent());
             try {
-                JsonNode root = objectMapper.readTree(jsonStream);               
-                annotationSnippet = "<snippet>" + root.at("/snippet").asText() + "</snippet>";
+                JsonNode root = objectMapper.readTree(jsonStream);
+                annotationSnippet = "<snippet>" + root.at("/snippet").asText()
+                        + "</snippet>";
             }
             catch (IOException e) {
-                throw new IOException("Failed processing response from KorAP match info API.");
+                throw new IOException(
+                        "Failed processing response from KorAP match info API.");
             }
             finally {
                 jsonStream.close();
@@ -266,12 +360,28 @@ public class KorapClient {
         }
         return annotationSnippet;
     }
-    
+
+    /**
+     * Builds a request URL to send to the KorAP MatchInfo service.
+     * 
+     * @param resourceId
+     *            the id of the corpus
+     * @param documentId
+     *            the id of the document
+     * @param matchId
+     *            the id of the match
+     * @param foundry
+     *            the annotation layer
+     * @return a HttpGet request
+     * @throws URISyntaxException
+     */
     private static HttpGet createMatchInfoRequest(String resourceId,
-            String documentId, String matchId, String foundry) throws URISyntaxException {
+            String documentId, String matchId, String foundry)
+            throws URISyntaxException {
+
         StringBuilder sb = new StringBuilder();
         sb.append(SERVICE_URI);
-//        sb.append("http://localhost:8089/api/v0.1/");
+        // sb.append("http://localhost:8089/api/v0.1/");
         sb.append("corpus/");
         sb.append(resourceId);
         sb.append("/");

@@ -3,6 +3,7 @@ package de.mannheim.ids.korap.sru;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,13 @@ import eu.clarin.sru.server.fcs.AdvancedDataViewWriter;
 import eu.clarin.sru.server.fcs.Layer;
 import eu.clarin.sru.server.fcs.XMLStreamWriterHelper;
 
+/**
+ * Prepares and creates a search result set for a search retrieve URL
+ * call.
+ * 
+ * @author margaretha
+ * 
+ */
 public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
     private Logger logger = (Logger) LoggerFactory
@@ -34,15 +42,28 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     private int i = -1;
     private KorapResult korapResult;
     private List<String> dataviews;
-    private KorapEndpointDescription endpointDescription;
     private SAXParser saxParser;
+    private Layer textLayer;
+    private AnnotationHandler annotationHandler;
 
-    Layer textLayer;
-
+    /**
+     * Constructs a KorapSRUSearchResultSet for the given KorapResult.
+     * 
+     * @param diagnostics
+     *            a list of SRU diagnostics
+     * @param korapResult
+     *            the query result
+     * @param dataviews
+     *            the required dataviews to generate
+     * @param textlayer
+     *            the text layer
+     * @param annotationLayers
+     *            the list of annotation layers
+     * @throws SRUException
+     */
     public KorapSRUSearchResultSet (SRUDiagnosticList diagnostics,
-            KorapResult korapResult, List<String> dataviews,
-            KorapEndpointDescription korapEndpointDescription)
-            throws SRUException {
+            KorapResult korapResult, List<String> dataviews, Layer textlayer,
+            List<AnnotationLayer> annotationLayers) throws SRUException {
         super(diagnostics);
 
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
@@ -55,9 +76,8 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
         this.korapResult = korapResult;
         this.dataviews = dataviews;
-        this.endpointDescription = korapEndpointDescription;
-
-        textLayer = endpointDescription.getSupportedLayers().get(0);
+        this.textLayer = textlayer;
+        annotationHandler = new AnnotationHandler(annotationLayers);
     }
 
     @Override
@@ -87,8 +107,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
     @Override
     public void writeRecord(XMLStreamWriter writer) throws XMLStreamException {
-        KorapMatch match;
-        match = parseMatch();
+        KorapMatch match = korapResult.getMatch(i);
         match.parseMatchId();
 
         XMLStreamWriterHelper.writeStartResource(writer, match.getMatchId(),
@@ -104,6 +123,14 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         XMLStreamWriterHelper.writeEndResource(writer);
     }
 
+    /**
+     * Parses the current match snippet from KorAP search API into
+     * keyword, left context and right context.
+     * 
+     * @return a KorapMatch
+     * @throws XMLStreamException
+     */
+    @Deprecated
     private KorapMatch parseMatch() throws XMLStreamException {
         KorapMatch match = korapResult.getMatch(i);
         String snippet = "<snippet>" + match.getSnippet() + "</snippet>";
@@ -117,22 +144,47 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         return match;
     }
 
+    /**
+     * Retrieves and parses the annotations of a match from KorAP
+     * MatchInfo API.
+     * 
+     * @param match
+     *            a KorapMatch
+     * @return a list of annotation layers containing the match
+     *         annotations.
+     * @throws XMLStreamException
+     */
     private List<AnnotationLayer> parseAnnotations(KorapMatch match)
             throws XMLStreamException {
-        AnnotationHandler annotationHandler = new AnnotationHandler(
-                endpointDescription.getAnnotationLayers());
+        if (match == null) {
+            throw new NullPointerException("KorapMatch is null.");
+        }
+
         try {
-            String annotationSnippet = KorapClient.retrieveAnnotations(match);
-            InputStream is = new ByteArrayInputStream(annotationSnippet.getBytes());
+            String annotationSnippet = KorapClient.retrieveAnnotations(
+                    match.getCorpusId(), match.getDocId(),
+                    match.getPositionId(), "*");
+            InputStream is = new ByteArrayInputStream(
+                    annotationSnippet.getBytes());
             saxParser.parse(is, annotationHandler);
         }
-        catch (SAXException | IOException e) {
+        catch (SAXException | IOException | URISyntaxException e) {
             throw new XMLStreamException(e);
         }
 
         return annotationHandler.getAnnotationLayers();
     }
 
+    /**
+     * Writes advanced data views, namely segment annotations for each
+     * annotation layer.
+     * 
+     * @param writer
+     *            an XMLStreamWriter
+     * @param annotationLayers
+     *            a list of annotation layers
+     * @throws XMLStreamException
+     */
     private void writeAdvancedDataView(XMLStreamWriter writer,
             List<AnnotationLayer> annotationLayers) throws XMLStreamException {
 
@@ -148,6 +200,15 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         }
     }
 
+    /**
+     * Adds all annotations to the AdvancedDataViewWriter.
+     * 
+     * @param helper
+     *            an AdvancedDataViewWriter
+     * @param annotationLayers
+     *            a list of annotation layers containing match
+     *            annotations.
+     */
     private void addAnnotationsToWriter(AdvancedDataViewWriter helper,
             List<AnnotationLayer> annotationLayers) {
 
@@ -168,13 +229,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
                 // for (Annotation annotation : annotations){
                 Annotation annotation = annotations.get(0);
 
-                // if
-                // (annotationLayer.getLayerCode().equals(AnnotationLayer.TYPE.TEXT.toString())){
-                // logger.info(annotation.getStart()+" "+
-                // annotation.getEnd()+" "+
-                // annotation.getValue());
-                // }
-                if (annotation.getHitLevel()>0) {
+                if (annotation.getHitLevel() > 0) {
                     helper.addSpan(annotationLayer.getLayerId(),
                             annotation.getStart(), annotation.getEnd(),
                             annotation.getValue(), annotation.getHitLevel());

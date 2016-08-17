@@ -24,6 +24,17 @@ import eu.clarin.sru.server.fcs.EndpointDescription;
 import eu.clarin.sru.server.fcs.Layer;
 import eu.clarin.sru.server.fcs.ResourceInfo;
 
+/**
+ * Contains information for generating a response of SRU explain
+ * operation with endpoint description.
+ * 
+ * Example:
+ * http://localhost:8080/KorapSRU?operation=explain&x-fcs-endpoint
+ * -description=true
+ * 
+ * @author margaretha
+ * 
+ */
 public class KorapEndpointDescription implements EndpointDescription {
 
     private List<DataView> dataviews;
@@ -32,7 +43,8 @@ public class KorapEndpointDescription implements EndpointDescription {
 
     private List<String> defaultDataviews;
     private List<Layer> layers;
-    
+    private Layer textLayer;
+
     private List<AnnotationLayer> annotationLayers;
 
     public KorapEndpointDescription (ServletContext context)
@@ -44,7 +56,8 @@ public class KorapEndpointDescription implements EndpointDescription {
             if (simpleEndpointDescription != null) {
                 setSupportedLayers(simpleEndpointDescription
                         .getSupportedLayers());
-                setAnnotationLayers(simpleEndpointDescription.getSupportedLayers());
+                setAnnotationLayers(simpleEndpointDescription
+                        .getSupportedLayers());
                 setSupportedDataViews(simpleEndpointDescription
                         .getSupportedDataViews());
                 setDefaultDataViews(simpleEndpointDescription
@@ -153,23 +166,24 @@ public class KorapEndpointDescription implements EndpointDescription {
 
     public void setAnnotationLayers(List<Layer> layers) {
         annotationLayers = new ArrayList<AnnotationLayer>(layers.size());
-        
+
         String layerCode;
-        
+
         for (Layer l : layers) {
-            
+
             String type = l.getType();
-            if (type.equals(AnnotationLayer.TYPE.TEXT.toString())){
+            if (type.equals(AnnotationLayer.TYPE.TEXT.toString())) {
                 layerCode = type;
+                this.textLayer = l;
             }
-            else{
+            else {
                 StringBuilder sb = new StringBuilder();
                 String qualifier = l.getQualifier();
 
                 if (qualifier != null) {
                     sb.append(qualifier);
-                    
-                    if (type.equals(AnnotationLayer.TYPE.POS.toString())) {            
+
+                    if (type.equals(AnnotationLayer.TYPE.POS.toString())) {
                         sb.append("/p");
                     }
                     else if (type.equals(AnnotationLayer.TYPE.LEMMA.toString())) {
@@ -182,9 +196,17 @@ public class KorapEndpointDescription implements EndpointDescription {
                 layerCode = sb.toString();
             }
 
-            AnnotationLayer annotationLayer = new AnnotationLayer(
-                    layerCode, l.getResultId());
+            AnnotationLayer annotationLayer = new AnnotationLayer(layerCode,
+                    l.getResultId());
             annotationLayers.add(annotationLayer);
         }
+    }
+
+    public Layer getTextLayer() {
+        return textLayer;
+    }
+
+    public void setTextLayer(Layer textLayer) {
+        this.textLayer = textLayer;
     }
 }
