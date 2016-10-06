@@ -9,7 +9,7 @@ CLARIN defines FCS specifications to allow distributed search across multiple he
 
 [KorapSRU 1.0.1 release] (https://github.com/KorAP/KorapSRU/releases/tag/release-1.0.1) implements FCS 1.0 specification and supports basic search using simple CQL (Contextual Query Language) for term query, phrase query and boolean query. FCS 2.0 specification is implemented in the newest version of KorapSRU, but it has not been released yet. It supports extended search (e.g. annotation search) that can be formulated using FCS Query Language (FCSQL) developed based on Corpus Query Processor([CQP](http://cwb.sourceforge.net/files/CQP_Tutorial/)).
 
-Usually CQL and FCSQL queries are translated into the native language of a search engine in an FCS endpoint. Since KorAP supports multiple query languages and has its own query translator [Koral](https://github.com/KorAP/Koral), the translation is implemented in Koral, not in KorapSRU. This allows KorAP users to use CQL and FCSQL in a KorAP user interface such as [Kalamar](https://github.com/KorAP/Kalamar).
+Usually CQL and FCSQL queries are translated into the native language of a search engine in an FCS endpoint. Since KorAP supports multiple query languages and has its own query translator [Koral](https://github.com/KorAP/Koral), the translation is implemented in Koral, not in KorapSRU. Therefore, KorAP users will also be able to use CQL and FCSQL.
 
 ## Supported SRU requests
 
