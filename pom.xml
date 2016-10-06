@@ -69,12 +69,12 @@
     </dependency>
   </dependencies> 
  
-  <!-- <repositories>
+  <repositories>
     <repository>
       <id>CLARIN</id>
       <url>https://nexus.clarin.eu/content/repositories/Clarin</url>
-      <url>http://catalog.clarin.eu/ds/nexus/content/repositories/Clarin/</url>
+      <!-- <url>http://catalog.clarin.eu/ds/nexus/content/repositories/Clarin/</url> -->
       <layout>default</layout>
     </repository>   
-  </repositories> -->
+  </repositories>
 </project>
