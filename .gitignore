@@ -1,4 +1,8 @@
 .classpath
 .project
 .settings
+<<<<<<< HEAD
 /target
+=======
+/target
+>>>>>>> branch 'dev' of ssh://margaretha@korap.ids-mannheim.de:29418/KorAP/KorapSRU
