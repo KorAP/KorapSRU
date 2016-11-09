@@ -34,6 +34,9 @@ Usually CQL and FCSQL queries are translated into the native language of a searc
 
 ## Installation
 
+Configure the service URI in the src/main/resource/kustvakt.conf file to a Kustvakt server URI, for example:
+> korapsru.client.service.uri=http://localhost:8089/api/v0.1/
+
 KorapSRU is built based on the FCSSimpleEndpoint library provided by CLARIN. KorapSRU 1.0.2-SNAPSHOT uses FCSSimpleEndpoint version 1.3.0 available from CLARIN Nexus repository. To allow Maven to download the library using JDK 1.7, an additional Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 7 is needed.
 
 To install a war file of KorapSRU, go to the root directory of the project and run
@@ -41,3 +44,4 @@ To install a war file of KorapSRU, go to the root directory of the project and r
 > mvn install -Dhttps.protocols=TLS1.2
 
 in  a terminal.
+
