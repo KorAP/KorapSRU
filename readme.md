@@ -30,6 +30,8 @@ Usually CQL and FCSQL queries are translated into the native language of a searc
  
 * Tomcat 7
 
+* Kustvakt (currently unavailable for public) 
+
 ## Installation
 
 KorapSRU is built based on the FCSSimpleEndpoint library provided by CLARIN. KorapSRU 1.0.2-SNAPSHOT uses FCSSimpleEndpoint version 1.3.0 available from CLARIN Nexus repository. To allow Maven to download the library using JDK 1.7, an additional Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 7 is needed.
