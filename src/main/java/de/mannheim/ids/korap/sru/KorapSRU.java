@@ -1,5 +1,6 @@
 package de.mannheim.ids.korap.sru;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +56,13 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
             SRUQueryParserRegistry.Builder parserRegistryBuilder,
             Map<String, String> params) throws SRUConfigException {
         // serverConfig = config;
-        korapClient = new KorapClient(config.getNumberOfRecords(),
-                config.getMaximumRecords());
+        try {
+            korapClient = new KorapClient(config.getNumberOfRecords(),
+                    config.getMaximumRecords());
+        }
+        catch (FileNotFoundException e) {
+            throw new SRUConfigException(e.getMessage());
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(config.getTransports());

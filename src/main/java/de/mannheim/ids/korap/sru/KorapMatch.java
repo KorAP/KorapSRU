@@ -14,6 +14,7 @@ public class KorapMatch {
     private String matchID;
     private String positionId;
     private String docId;
+    private String textId;
     private String corpusId;
     private String leftContext;
     private String keyword;
@@ -23,7 +24,7 @@ public class KorapMatch {
 
     private List<AnnotationLayer> annotationLayers = new ArrayList<AnnotationLayer>();
     
-    private static Pattern idPattern = Pattern.compile("match-(.*)_(.*)-p([0-9]+-[0-9]+)");
+    private static Pattern idPattern = Pattern.compile("match-(.*)/(.*)/(.*)-p([0-9]+-[0-9]+)");
 
     public KorapMatch () {}
     
@@ -41,7 +42,8 @@ public class KorapMatch {
         if (matcher.find()){
             this.corpusId = matcher.group(1);
             this.docId = matcher.group(2);
-            this.positionId = "p"+matcher.group(3);
+            this.setTextId(matcher.group(3));
+            this.positionId = "p"+matcher.group(4);
         }
     } 
     
@@ -53,12 +55,20 @@ public class KorapMatch {
         return positionId;
     }
 
+    public String getTextId () {
+        return textId;
+    }
+
+    public void setTextId (String textId) {
+        this.textId = textId;
+    }
+
     public String getDocId() {
         return docId;
     }
 
     public void setDocId(String docID) {
-        this.docId = docID.replace(corpusId + "_", "");
+        this.docId = docID;
     }
 
     public String getCorpusId() {

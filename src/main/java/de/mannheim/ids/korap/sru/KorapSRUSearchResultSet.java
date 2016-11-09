@@ -109,7 +109,6 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     public void writeRecord(XMLStreamWriter writer) throws XMLStreamException {
         KorapMatch match = korapResult.getMatch(i);
         match.parseMatchId();
-
         XMLStreamWriterHelper.writeStartResource(writer, match.getMatchId(),
                 null);
         XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
@@ -162,10 +161,10 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
         try {
             String annotationSnippet = KorapClient.retrieveAnnotations(
-                    match.getCorpusId(), match.getDocId(),
+                    match.getCorpusId(), match.getDocId(), match.getTextId(),
                     match.getPositionId(), "*");
             InputStream is = new ByteArrayInputStream(
-                    annotationSnippet.getBytes());
+                    annotationSnippet.getBytes("UTF-8"));
             saxParser.parse(is, annotationHandler);
         }
         catch (SAXException | IOException | URISyntaxException e) {
