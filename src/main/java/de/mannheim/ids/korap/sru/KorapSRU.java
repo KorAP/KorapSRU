@@ -102,6 +102,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                 queryLanguage);
         checkKorapResultError(korapResult, queryLanguage,
                 isRewitesAllowed(request), diagnostics);
+        logger.info("Number of records: "+korapResult.getTotalResults());
 
         return new KorapSRUSearchResultSet(diagnostics, korapResult, dataviews,
                 korapEndpointDescription.getTextLayer(),
