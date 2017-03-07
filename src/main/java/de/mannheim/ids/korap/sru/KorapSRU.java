@@ -167,7 +167,10 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                 for (DataView dv : korapEndpointDescription
                         .getSupportedDataViews()) {
                     if (dv.getIdentifier().equals(requestDataview)) {
-                        dataviews.add(requestDataview);
+                        if (!dataviews.contains(requestDataview)){
+                        	dataviews.add(requestDataview);
+                        }
+                        return dataviews;
                     }
                 }
                 diagnostics.addDiagnostic(

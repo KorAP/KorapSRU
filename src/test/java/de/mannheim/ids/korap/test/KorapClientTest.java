@@ -51,9 +51,7 @@ public class KorapClientTest {
     public void testResource () throws HttpResponseException, Exception {
         JsonNode resources = c.retrieveResources();
 
-        assertEquals(3, resources.size());
-        assertEquals("Weimarer Werke", resources.get(0).get("name"));
-        assertEquals("Aphorismen", resources.get(0).get("name"));
-        assertEquals("Werther", resources.get(0).get("name"));
+        assertEquals(1, resources.size());
+        assertEquals("Wikipedia", resources.get(0).get("name").asText());
     }
 }

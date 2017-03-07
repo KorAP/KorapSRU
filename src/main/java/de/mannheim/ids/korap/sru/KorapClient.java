@@ -99,8 +99,7 @@ public class KorapClient {
     public JsonNode retrieveResources ()
             throws URISyntaxException, IOException {
 
-        URIBuilder builder = new URIBuilder(SERVICE_URI + "VirtualCollection");
-        // builder.addParameter("type", "VirtualCollection");
+        URIBuilder builder = new URIBuilder(SERVICE_URI + "Corpus");
         URI uri = builder.build();
         logger.info("Resource URI: " + uri.toString());
         HttpGet httpRequest = new HttpGet(uri);
