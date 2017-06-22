@@ -1,6 +1,7 @@
 package de.mannheim.ids.korap.sru;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.clarin.sru.server.SRUConfigException;
 import eu.clarin.sru.server.SRUConstants;
@@ -46,7 +48,8 @@ public class KorapEndpointDescription implements EndpointDescription {
     private Layer textLayer;
 
     private List<AnnotationLayer> annotationLayers;
-
+    private ObjectMapper mapper = new ObjectMapper();
+    
     public KorapEndpointDescription (ServletContext context)
             throws SRUConfigException {
         try {
@@ -114,9 +117,12 @@ public class KorapEndpointDescription implements EndpointDescription {
         JsonNode resources;
 
         try {
-            resources = KorapSRU.korapClient.retrieveResources();
+            //resources = KorapSRU.korapClient.retrieveResources();
+            InputStream is = getClass().getClassLoader().getResourceAsStream("resources.json");
+            resources = mapper.readTree(is); 
         }
-        catch (URISyntaxException | IOException e) {
+        catch ( //URISyntaxException | 
+                IOException e) {
             throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
                     "Failed retrieving resources.");
         }

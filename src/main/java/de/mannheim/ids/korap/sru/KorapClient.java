@@ -421,7 +421,7 @@ public class KorapClient {
         sb.append(resourceId);
         sb.append("/");
         sb.append(documentId);
-        sb.append(".");
+        sb.append("/");
         sb.append(textId);
         sb.append("/");
         sb.append(matchId);

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.http.client.HttpResponseException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,18 +42,18 @@ public class KorapClientTest {
 
     @Test
     public void testCQLQuery () throws HttpResponseException, IOException {
-        result = c.query("Haus", QueryLanguage.CQL, "1.2", 1, 25,
+        result = c.query("der", QueryLanguage.CQL, "1.2", 1, 25,
                 null);
         assertEquals(25, result.getMatchSize());
-        assertEquals(136, result.getTotalResults());
+        assertEquals(1858, result.getTotalResults());
     
         match = result.getMatch(0);
-        assertEquals("match-GOE/AGF/00000-p8891-8892",match.getMatchId());
+        assertEquals("match-GOE/AGA/01784-p18-19",match.getMatchId());
         
         match.parseMatchId();
         assertEquals("GOE", match.getCorpusId());
-        assertEquals("AGF", match.getDocId());
-        assertEquals("p8891-8892", match.getPositionId());
+        assertEquals("AGA", match.getDocId());
+        assertEquals("p18-19", match.getPositionId());
         
     }
 
@@ -62,15 +63,15 @@ public class KorapClientTest {
                 25, null);
     	
     	assertEquals(25, result.getMatchSize());
-        assertEquals(96, result.getTotalResults());
+        assertEquals(55, result.getTotalResults());
 
         match = result.getMatch(0);
-        assertEquals("match-GOE/AGF/00000-p7667-7668",match.getMatchId());
+        assertEquals("match-GOE/AGF/00000-p7744-7745",match.getMatchId());
         
         match.parseMatchId();
         assertEquals("GOE", match.getCorpusId());
         assertEquals("AGF", match.getDocId());
-        assertEquals("p7667-7668", match.getPositionId());
+        assertEquals("p7744-7745", match.getPositionId());
 	}
     
     @Test
@@ -93,11 +94,12 @@ public class KorapClientTest {
 	}
     
     @Test
+    @Ignore
     public void testRetrieveResource () throws HttpResponseException, Exception {
         JsonNode resources = c.retrieveResources();
 
         //assertEquals(1, resources.size());
-        assertEquals("Wikipedia", resources.get(0).get("name").asText());
+        assertEquals("Wikipedia 2015", resources.get(0).get("name").asText());
         assertEquals("Deutsche Wikipedia 2015", resources.get(0).get("description").asText());
     }
 }
