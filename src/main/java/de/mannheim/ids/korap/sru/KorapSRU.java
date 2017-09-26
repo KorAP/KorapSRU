@@ -55,14 +55,10 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
     protected void doInit(ServletContext context, SRUServerConfig config,
             SRUQueryParserRegistry.Builder parserRegistryBuilder,
             Map<String, String> params) throws SRUConfigException {
-        // serverConfig = config;
-        try {
-            korapClient = new KorapClient(config.getNumberOfRecords(),
-                    config.getMaximumRecords());
-        }
-        catch (FileNotFoundException e) {
-            throw new SRUConfigException(e.getMessage());
-        }
+
+        korapClient = new KorapClient(context.getInitParameter("korap.service.uri"),
+                config.getNumberOfRecords(),
+                config.getMaximumRecords());
 
         StringBuilder sb = new StringBuilder();
         sb.append(config.getTransports());

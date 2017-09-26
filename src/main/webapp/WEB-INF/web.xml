@@ -11,6 +11,10 @@
     <servlet-name>KorapSRU</servlet-name>
     <servlet-class>eu.clarin.sru.server.utils.SRUServerServlet</servlet-class>
     <init-param>
+        <param-name>korap.service.uri</param-name>
+        <param-value>http://10.0.10.52:9000/api/</param-value>
+    </init-param>
+    <init-param>
         <param-name>eu.clarin.sru.server.numberOfRecords</param-name>
         <param-value>25</param-value>
     </init-param>

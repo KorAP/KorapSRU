@@ -37,9 +37,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class KorapClient {
 
-    private static String SERVICE_URI;
-    private static final String CONFIGURATION_FILE = "kustvakt.conf";
-    private static final String SERVICE_URI_PROPERTY = "korapsru.client.service.uri";
+    private static String serviceUri;
+    private static final String CONFIGURATION_FILE =
+            "kustvakt.conf";
+    private static final String SERVICE_URI_PROPERTY =
+            "korapsru.client.service.uri";
     private static final String DEFAULT_CONTEXT_TYPE = "sentence";
     private static final String DEFAULT_FOUNDRY = "*";
 
@@ -47,8 +49,8 @@ public class KorapClient {
     private int defaultMaxRecords = 10;
 
     private static ObjectMapper objectMapper = new ObjectMapper();
-    private static Logger logger = (Logger) LoggerFactory
-            .getLogger(KorapClient.class);
+    private static Logger logger =
+            (Logger) LoggerFactory.getLogger(KorapClient.class);
 
 
     /**
@@ -65,25 +67,32 @@ public class KorapClient {
             throws FileNotFoundException {
         this.defaultNumOfRecords = numOfRecords;
         this.defaultMaxRecords = maxRecords;
-
+        
         Properties properties = new Properties();
+        String path = System.getenv("$HOME")+"/"+CONFIGURATION_FILE;
         InputStream is = getClass().getClassLoader()
-                .getResourceAsStream(CONFIGURATION_FILE);
+                .getResourceAsStream(path);
         try {
             properties.load(is);
         }
         catch (IOException e) {
             throw new FileNotFoundException("Configuration file "
-                    + CONFIGURATION_FILE + " is not found in the classpath.");
+                    + CONFIGURATION_FILE + " is not found.");
         }
         if (properties.containsKey(SERVICE_URI_PROPERTY)) {
-            SERVICE_URI = properties.getProperty("korapsru.client.service.uri");
-            logger.info(SERVICE_URI);
+            serviceUri = properties.getProperty("korapsru.client.service.uri");
+            logger.info(serviceUri);
         }
         else {
             throw new NullPointerException("Please specify korapsru.client."
                     + "service.uri in the configuration file.");
         }
+    }
+    
+    public KorapClient (String serviceUri, int numOfRecords, int maxRecords){
+        this.defaultNumOfRecords = numOfRecords;
+        this.defaultMaxRecords = maxRecords;
+        this.serviceUri = serviceUri;
     }
 
 
@@ -99,7 +108,7 @@ public class KorapClient {
     public JsonNode retrieveResources ()
             throws URISyntaxException, IOException {
 
-        URIBuilder builder = new URIBuilder(SERVICE_URI + "Corpus");
+        URIBuilder builder = new URIBuilder(serviceUri + "Corpus");
         URI uri = builder.build();
         logger.info("Resource URI: " + uri.toString());
         HttpGet httpRequest = new HttpGet(uri);
@@ -120,8 +129,8 @@ public class KorapClient {
                         response.getStatusLine().getReasonPhrase());
             }
 
-            BufferedInputStream jsonStream = new BufferedInputStream(
-                    response.getEntity().getContent());
+            BufferedInputStream jsonStream =
+                    new BufferedInputStream(response.getEntity().getContent());
             try {
                 resources = objectMapper.readValue(jsonStream, JsonNode.class);
             }
@@ -199,8 +208,8 @@ public class KorapClient {
                 parseError(response);
             }
 
-            BufferedInputStream jsonStream = new BufferedInputStream(
-                    response.getEntity().getContent());
+            BufferedInputStream jsonStream =
+                    new BufferedInputStream(response.getEntity().getContent());
             try {
                 result = objectMapper.readValue(jsonStream, KorapResult.class);
             }
@@ -212,7 +221,7 @@ public class KorapClient {
             }
         }
         catch (IOException e) {
-            throw new IOException("Failed executing HTTP request.",e);
+            throw new IOException("Failed executing HTTP request.", e);
         }
         finally {
             response.close();
@@ -297,7 +306,7 @@ public class KorapClient {
         params.add(
                 new BasicNameValuePair("offset", String.valueOf(startRecord)));
 
-        URIBuilder builder = new URIBuilder(SERVICE_URI + "search");
+        URIBuilder builder = new URIBuilder(serviceUri + "search");
         builder.addParameters(params);
 
         URI uri = builder.build();
@@ -359,8 +368,8 @@ public class KorapClient {
         }
 
         HttpUriRequest httpRequest;
-        httpRequest = createMatchInfoRequest(resourceId, documentId, textId, matchId,
-                foundry);
+        httpRequest = createMatchInfoRequest(resourceId, documentId, textId,
+                matchId, foundry);
 
         String annotationSnippet = null;
 
@@ -375,8 +384,8 @@ public class KorapClient {
                 parseError(response);
             }
 
-            BufferedInputStream jsonStream = new BufferedInputStream(
-                    response.getEntity().getContent());
+            BufferedInputStream jsonStream =
+                    new BufferedInputStream(response.getEntity().getContent());
             try {
                 JsonNode root = objectMapper.readTree(jsonStream);
                 annotationSnippet = "<snippet>" + root.at("/snippet").asText()
@@ -416,7 +425,7 @@ public class KorapClient {
             throws URISyntaxException {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(SERVICE_URI);
+        sb.append(serviceUri);
         sb.append("corpus/");
         sb.append(resourceId);
         sb.append("/");
