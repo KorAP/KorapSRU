@@ -7,7 +7,7 @@
 
 	<context-param>
 		<param-name>korap.service.uri</param-name>
-		<param-value>http://10.0.10.52:9000/api/</param-value>
+		<param-value>http://localhost:8089/api/</param-value>
 	</context-param>
 
 	<servlet>
@@ -53,6 +53,10 @@
 		<init-param>
 			<param-name>eu.clarin.sru.server.legacyNamespaceMode</param-name>
 			<param-value>loc</param-value>
+		</init-param>
+		<init-param>
+			<param-name>eu.clarin.sru.server.sruSupportedVersionDefault</param-name>
+			<param-value>2.0</param-value>
 		</init-param>
 		<init-param>
 			<param-name>eu.clarin.sru.server.sruSupportedVersionMax</param-name>

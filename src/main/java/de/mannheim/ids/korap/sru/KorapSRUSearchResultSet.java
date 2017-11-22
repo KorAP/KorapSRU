@@ -45,9 +45,11 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     private SAXParser saxParser;
     private Layer textLayer;
     private AnnotationHandler annotationHandler;
+    private KorapClient korapClient;
 
     /**
      * Constructs a KorapSRUSearchResultSet for the given KorapResult.
+     * @param korapClient 
      * 
      * @param diagnostics
      *            a list of SRU diagnostics
@@ -61,7 +63,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
      *            the list of annotation layers
      * @throws SRUException
      */
-    public KorapSRUSearchResultSet (SRUDiagnosticList diagnostics,
+    public KorapSRUSearchResultSet (KorapClient korapClient, SRUDiagnosticList diagnostics,
             KorapResult korapResult, List<String> dataviews, Layer textlayer,
             List<AnnotationLayer> annotationLayers) throws SRUException {
         super(diagnostics);
@@ -74,6 +76,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
             throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR, e);
         }
 
+        this.korapClient = korapClient;
         this.korapResult = korapResult;
         this.dataviews = dataviews;
         this.textLayer = textlayer;
@@ -160,7 +163,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         }
 
         try {
-            String annotationSnippet = KorapClient.retrieveAnnotations(
+            String annotationSnippet = korapClient.retrieveAnnotations(
                     match.getCorpusId(), match.getDocId(), match.getTextId(),
                     match.getPositionId(), "*");
             InputStream is = new ByteArrayInputStream(

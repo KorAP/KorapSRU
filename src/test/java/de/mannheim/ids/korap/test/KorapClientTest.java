@@ -35,11 +35,6 @@ public class KorapClientTest {
     private KorapResult result;
     private KorapMatch match;
 
-    public KorapClientTest () throws FileNotFoundException {
-        c = new KorapClient(25, 50);
-    }
-
-
     @Test
     public void testCQLQuery () throws HttpResponseException, IOException {
         result = c.query("der", QueryLanguage.CQL, "1.2", 1, 25,
@@ -76,7 +71,7 @@ public class KorapClientTest {
     
     @Test
     public void testRetrieveAnnotations() throws IOException, URISyntaxException {
-    	String annotationSnippet = KorapClient.retrieveAnnotations(
+    	String annotationSnippet = c.retrieveAnnotations(
     			"GOE", "AGF", "00000",
     			"p7667-7668", "*");
     	
@@ -86,7 +81,7 @@ public class KorapClientTest {
     
     @Test
     public void testRetrieveNonexistingAnnotation() throws IOException, URISyntaxException {
-    	String annotationSnippet = KorapClient.retrieveAnnotations(
+    	String annotationSnippet = c.retrieveAnnotations(
     			"WPD15", "D18", "06488",
     			"p588-589", "*");
     	

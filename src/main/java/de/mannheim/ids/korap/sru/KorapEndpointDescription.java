@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,11 +19,11 @@ import eu.clarin.sru.server.SRUConfigException;
 import eu.clarin.sru.server.SRUConstants;
 import eu.clarin.sru.server.SRUException;
 import eu.clarin.sru.server.fcs.DataView;
-import eu.clarin.sru.server.fcs.utils.SimpleEndpointDescriptionParser;
 import eu.clarin.sru.server.fcs.DataView.DeliveryPolicy;
 import eu.clarin.sru.server.fcs.EndpointDescription;
 import eu.clarin.sru.server.fcs.Layer;
 import eu.clarin.sru.server.fcs.ResourceInfo;
+import eu.clarin.sru.server.fcs.utils.SimpleEndpointDescriptionParser;
 
 /**
  * Contains information for generating a response of SRU explain

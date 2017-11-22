@@ -37,9 +37,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class KorapClient {
 
-    private static String serviceUri;
-    private static final String CONFIGURATION_FILE =
-            "kustvakt.conf";
+    private String serviceUri;
+    private static final String CONFIGURATION_FILE = "kustvakt.conf";
     private static final String SERVICE_URI_PROPERTY =
             "korapsru.client.service.uri";
     private static final String DEFAULT_CONTEXT_TYPE = "sentence";
@@ -52,44 +51,19 @@ public class KorapClient {
     private static Logger logger =
             (Logger) LoggerFactory.getLogger(KorapClient.class);
 
-
     /**
      * Constructs a KorapClient with the given number of records per
      * page and the maximum number of records.
      * 
+     * @param serviceUri 
+     *            KorAP service URI          
      * @param numOfRecords
      *            the number of records per page
      * @param maxRecords
      *            the number of maximum records/matches to retrieve
      * @throws FileNotFoundException
      */
-    public KorapClient (int numOfRecords, int maxRecords)
-            throws FileNotFoundException {
-        this.defaultNumOfRecords = numOfRecords;
-        this.defaultMaxRecords = maxRecords;
-        
-        Properties properties = new Properties();
-        String path = System.getenv("$HOME")+"/"+CONFIGURATION_FILE;
-        InputStream is = getClass().getClassLoader()
-                .getResourceAsStream(path);
-        try {
-            properties.load(is);
-        }
-        catch (IOException e) {
-            throw new FileNotFoundException("Configuration file "
-                    + CONFIGURATION_FILE + " is not found.");
-        }
-        if (properties.containsKey(SERVICE_URI_PROPERTY)) {
-            serviceUri = properties.getProperty("korapsru.client.service.uri");
-            logger.info(serviceUri);
-        }
-        else {
-            throw new NullPointerException("Please specify korapsru.client."
-                    + "service.uri in the configuration file.");
-        }
-    }
-    
-    public KorapClient (String serviceUri, int numOfRecords, int maxRecords){
+    public KorapClient (String serviceUri, int numOfRecords, int maxRecords) {
         this.defaultNumOfRecords = numOfRecords;
         this.defaultMaxRecords = maxRecords;
         this.serviceUri = serviceUri;
@@ -335,7 +309,7 @@ public class KorapClient {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static String retrieveAnnotations (String resourceId,
+    public String retrieveAnnotations (String resourceId,
             String documentId, String textId, String matchId, String foundry)
             throws IOException, URISyntaxException {
 
@@ -420,7 +394,7 @@ public class KorapClient {
      * @return a HttpGet request
      * @throws URISyntaxException
      */
-    private static HttpGet createMatchInfoRequest (String resourceId,
+    private HttpGet createMatchInfoRequest (String resourceId,
             String documentId, String textId, String matchId, String foundry)
             throws URISyntaxException {
 
