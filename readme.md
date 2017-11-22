@@ -37,9 +37,9 @@ Examples:
 > [http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2](http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2)
 
 * Annotation search using FCSQL
-> http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=\[tt:lemma=".*bar"\]&queryType=fcs
+> http:<i></i>//clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=[tt:lemma=".*bar"]&queryType=fcs
 
-  The query must not be URL-encoded.
+  Copy and paste the query to a browser. The query must not be URL-encoded.
   
 ## Software Requirements
   
