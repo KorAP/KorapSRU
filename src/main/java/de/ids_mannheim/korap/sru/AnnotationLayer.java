@@ -1,4 +1,4 @@
-package de.mannheim.ids.korap.sru;
+package de.ids_mannheim.korap.sru;
 
 import java.net.URI;
 import java.util.HashMap;

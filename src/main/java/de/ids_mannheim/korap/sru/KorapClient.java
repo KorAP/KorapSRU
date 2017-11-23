@@ -1,4 +1,4 @@
-package de.mannheim.ids.korap.sru;
+package de.ids_mannheim.korap.sru;
 
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
@@ -8,7 +8,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -38,9 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class KorapClient {
 
     private String serviceUri;
-    private static final String CONFIGURATION_FILE = "kustvakt.conf";
-    private static final String SERVICE_URI_PROPERTY =
-            "korapsru.client.service.uri";
     private static final String DEFAULT_CONTEXT_TYPE = "sentence";
     private static final String DEFAULT_FOUNDRY = "*";
 

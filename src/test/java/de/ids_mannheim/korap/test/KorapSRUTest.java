@@ -1,4 +1,4 @@
-package de.mannheim.ids.korap.test;
+package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,12 +25,10 @@ import org.xml.sax.SAXException;
 
 /**
  * The tests are based on the sample corpus from the Goethe corpus.
- * Skip the tests if Kustvakt does not have this corpus in the Krill
- * index.
  * 
  * The tests require a running KustvaktServer.
- * Specify the Kustvakt service URI in the configuration file at
- * src/main/resources/kustvakt.conf.
+ * Specify the Kustvakt service URI at
+ * /KorapSRU/src/main/webapp/WEB-INF/web.xml
  * 
  * @author margaretha
  *
@@ -112,7 +110,7 @@ public class KorapSRUTest {
 		
 		node = node.getFirstChild();
 		attr = node.getAttributes().getNamedItem("id").getNodeValue();
-		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/pos2", attr);
+		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/text", attr);
 //		assertEquals(50, node.getChildNodes().getLength());
 	}
 	

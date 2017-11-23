@@ -1,4 +1,4 @@
-package de.mannheim.ids.korap.test;
+package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,20 +11,20 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.mannheim.ids.korap.sru.KorapClient;
-import de.mannheim.ids.korap.sru.KorapMatch;
-import de.mannheim.ids.korap.sru.KorapResult;
-import de.mannheim.ids.korap.sru.QueryLanguage;
+import de.ids_mannheim.korap.sru.KorapClient;
+import de.ids_mannheim.korap.sru.KorapMatch;
+import de.ids_mannheim.korap.sru.KorapResult;
+import de.ids_mannheim.korap.sru.QueryLanguage;
 
 
 /**
  * The tests are based on the sample corpus from the Goethe corpus.
- * Skip the tests if Kustvakt does not have this corpus in the Krill
- * index.
  * 
  * The tests require a running KustvaktServer.
- * Specify the Kustvakt service URI in the configuration file at
- * src/main/resources/kustvakt.conf.
+ * Specify the Kustvakt service URI at
+ * /KorapSRU/src/main/webapp/WEB-INF/web.xml
+ * 
+ * and in the initialization of KorapClient in the code below.
  * 
  * @author margaretha
  *
@@ -33,6 +33,10 @@ public class KorapClientTest {
     private KorapClient c;
     private KorapResult result;
     private KorapMatch match;
+    
+    public KorapClientTest () {
+        c = new KorapClient("http://localhost:8089/api/", 25, 50);
+    }
 
     @Test
     public void testCQLQuery () throws HttpResponseException, IOException {

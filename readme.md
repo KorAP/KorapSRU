@@ -16,7 +16,7 @@ Usually CQL and FCSQL queries are translated into the native language of a searc
 ### SRU explain request
 
 gives general information about KorapSRU and some default search settings, for instance the number of records it retrieves per page. See: 
-> [http://clarin.ids-mannheim.de/korapsru?operation=explain](http://clarin.ids-mannheim.de/korapsru?operation=explain)
+> [https://clarin.ids-mannheim.de/korapsru?operation=explain](http://clarin.ids-mannheim.de/korapsru?operation=explain)
 
 
 To obtain more information such as supported annotation layers needed for requesting an extended search, 
@@ -26,7 +26,7 @@ x-fcs-endpoint-description=true
 ```
 
 must be added as an extra request parameter. See: 
-> [http://clarin.ids-mannheim.de/korapsru?operation=explain&x-fcs-endpoint-description=true](http://clarin.ids-mannheim.de/korapsru?operation=explain&x-fcs-endpoint-description=true)
+> [https://clarin.ids-mannheim.de/korapsru?operation=explain&x-fcs-endpoint-description=true](http://clarin.ids-mannheim.de/korapsru?operation=explain&x-fcs-endpoint-description=true)
 
 ### SRU search retrieve request  
 
@@ -34,12 +34,16 @@ contains a CQL or FCSQL query. KorapSRU forwards the CQL or FCSQL query in an SR
 
 Examples:
 * Basic search using CQL
-> [http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2](http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2)
 
-* Annotation search using FCSQL
-> http:<i></i>//clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=[tt:lemma=".*bar"]&queryType=fcs
+Searching for all occurrences of term ```Buch``` (means book in German)
+> [https://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2](http://clarin.ids-mannheim.de/korapsru?operation=searchRetrieve&query=Buch&version=1.2)
 
-  Copy and paste the query to a browser. The query must not be URL-encoded.
+* Annotation search using FCSQL 
+
+Searching for all lemmas from Tree tagger annotations containing ```heit```,
+in FCS query: ```[tt:lemma=".*heit"]```
+> https://clarin.ids-mannheim.de/korapsru?operation=startRetrieve&query=%5Btt%3Alemma%3D%22.*heit%22%5D&queryType=fcs
+  
   
 ## Software Requirements
   
