@@ -81,5 +81,37 @@ public class FCSQLRequestTest {
         assertEquals("134", nodeList.item(0).getTextContent());
         response.close();
     }
+    
+    @Test
+    public void testLemmaRegex () throws URISyntaxException, IOException,
+            SAXException, ParserConfigurationException {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("operation", "startRetrieve"));
+        params.add(new BasicNameValuePair("query", "[lemma=\".*bar\"]"));
+        params.add(new BasicNameValuePair("queryType", "fcs"));
+
+        URIBuilder builder = new URIBuilder(korapSruUri);
+        builder.addParameters(params);
+
+        URI uri = builder.build();
+        assertEquals(
+                "http://localhost:8080/KorapSRU?operation=startRetrieve&query=%5Blemma%3D%22.*bar%22%5D&queryType=fcs",
+                uri.toString());
+
+        HttpGet request = new HttpGet(uri);
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        response = client.execute(request);
+
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        InputStream is = response.getEntity().getContent();
+        Document document = documentBuilder.parse(is);
+        NodeList nodeList =
+                document.getElementsByTagName("sruResponse:numberOfRecords");
+
+        assertEquals("134", nodeList.item(0).getTextContent());
+        response.close();
+    }
 
 }
