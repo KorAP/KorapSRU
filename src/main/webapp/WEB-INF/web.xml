@@ -7,7 +7,7 @@
 
 	<context-param>
 		<param-name>korap.service.uri</param-name>
-		<param-value>http://localhost:8089/api/</param-value>
+		<param-value>http://localhost:8089/api/v1.0/</param-value>
 	</context-param>
 
 	<servlet>
@@ -48,7 +48,7 @@
 		</init-param>
 		<init-param>
 			<param-name>eu.clarin.sru.server.utils.sruServerSearchEngineClass</param-name>
-			<param-value>de.mannheim.ids.korap.sru.KorapSRU</param-value>
+			<param-value>de.ids_mannheim.korap.sru.KorapSRU</param-value>
 		</init-param>
 		<init-param>
 			<param-name>eu.clarin.sru.server.legacyNamespaceMode</param-name>
@@ -74,12 +74,12 @@
 		<jsp-file>/_redirect.jsp</jsp-file>
 		<init-param>
 			<param-name>korapWebUrl</param-name>
-			<param-value>http://korap.ids-mannheim.de/kalamar</param-value>
+			<param-value>http://korap.ids-mannheim.de</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>ResourceService</servlet-name>
 		<url-pattern>/redirect/*</url-pattern>
 	</servlet-mapping>
-
+	
 </web-app>

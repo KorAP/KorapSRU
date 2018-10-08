@@ -33,7 +33,7 @@ import eu.clarin.sru.server.fcs.SimpleEndpointSearchEngineBase;
 public class KorapSRU extends SimpleEndpointSearchEngineBase {
 
     public static final String CLARIN_FCS_RECORD_SCHEMA = "http://clarin.eu/fcs/resource";
-    public static final String KORAP_WEB_URL = "http://korap.ids-mannheim.de/kalamar";
+    public static final String KORAP_WEB_URL = "http://korap.ids-mannheim.de/";
 
     public static String redirectBaseURI;
     public static KorapClient korapClient;
