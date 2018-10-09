@@ -11,12 +11,14 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -26,6 +28,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.ids_mannheim.korap.util.RedirectStrategy;
 
 /**
  * Client to KorAP public services supporting calls to the resource,
@@ -51,8 +55,8 @@ public class KorapClient {
      * Constructs a KorapClient with the given number of records per
      * page and the maximum number of records.
      * 
-     * @param serviceUri 
-     *            KorAP service URI          
+     * @param serviceUri
+     *            KorAP service URI
      * @param numOfRecords
      *            the number of records per page
      * @param maxRecords
@@ -64,7 +68,6 @@ public class KorapClient {
         this.defaultMaxRecords = maxRecords;
         this.serviceUri = serviceUri;
     }
-
 
     /**
      * Gets information about available resources to search through
@@ -118,7 +121,6 @@ public class KorapClient {
         return resources;
     }
 
-
     /**
      * Sends the given query to KorAP search API and creates a
      * KorapResult from the response.
@@ -166,18 +168,10 @@ public class KorapClient {
             throw new IOException("Failed creating http request.");
         }
 
-        CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         KorapResult result = null;
         try {
-            response = client.execute(httpRequest);
-
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != HttpStatus.SC_OK) {
-                logger.warn("Error response code: " + statusCode);
-                parseError(response);
-            }
-
+            response = sendRequest(httpRequest);
             BufferedInputStream jsonStream =
                     new BufferedInputStream(response.getEntity().getContent());
             try {
@@ -200,6 +194,19 @@ public class KorapClient {
         return result;
     }
 
+    private CloseableHttpResponse sendRequest (HttpUriRequest httpRequest)
+            throws ClientProtocolException, IOException {
+        CloseableHttpClient client = HttpClientBuilder.create()
+                .setRedirectStrategy(new RedirectStrategy()).build();
+        CloseableHttpResponse response = client.execute(httpRequest);
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            logger.warn("Error response code: " + statusCode);
+            parseError(response);
+        }
+        return response;
+    }
 
     /**
      * Parses the error message from Kustvakt (probably an old
@@ -235,7 +242,6 @@ public class KorapClient {
         throw new HttpResponseException(Integer.parseInt(errorItems[0]),
                 errorItems[1]);
     }
-
 
     /**
      * Builds a search retrieve GET request for the given parameters.
@@ -285,7 +291,6 @@ public class KorapClient {
         return request;
     }
 
-
     /**
      * Sends a request to the MatchInfo API to get the annotations of
      * a particular match identified with corpus/resource id, document
@@ -305,8 +310,8 @@ public class KorapClient {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public String retrieveAnnotations (String resourceId,
-            String documentId, String textId, String matchId, String foundry)
+    public String retrieveAnnotations (String resourceId, String documentId,
+            String textId, String matchId, String foundry)
             throws IOException, URISyntaxException {
 
         if (resourceId == null) {
@@ -337,22 +342,14 @@ public class KorapClient {
             foundry = DEFAULT_FOUNDRY;
         }
 
-        HttpUriRequest httpRequest;
-        httpRequest = createMatchInfoRequest(resourceId, documentId, textId,
-                matchId, foundry);
+        HttpUriRequest httpRequest = createMatchInfoRequest(resourceId,
+                documentId, textId, matchId, foundry);
 
         String annotationSnippet = null;
 
-        CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         try {
-            response = client.execute(httpRequest);
-
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != HttpStatus.SC_OK) {
-                logger.warn("Error response code: " + statusCode);
-                parseError(response);
-            }
+            response = sendRequest(httpRequest);
 
             BufferedInputStream jsonStream =
                     new BufferedInputStream(response.getEntity().getContent());
@@ -374,7 +371,6 @@ public class KorapClient {
         }
         return annotationSnippet;
     }
-
 
     /**
      * Builds a request URL to send to the KorAP MatchInfo service.
