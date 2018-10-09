@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * @author margaretha
  *
  */
-public class KorapSRUTest {
+public class KorapSRUTest extends KorapJerseyTest{
 	private int port = 8080;
 	
 	DocumentBuilder docBuilder;
@@ -110,7 +110,7 @@ public class KorapSRUTest {
 		
 		node = node.getFirstChild();
 		attr = node.getAttributes().getNamedItem("id").getNodeValue();
-		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/text", attr);
+		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/pos/opennlp", attr);
 //		assertEquals(50, node.getChildNodes().getLength());
 	}
 	
@@ -142,9 +142,9 @@ public class KorapSRUTest {
 		
 		NodeList children = nodelist.item(0).getChildNodes();
 		assertEquals("zr:host", children.item(0).getNodeName());
-		assertEquals("clarin.ids-mannheim.de", children.item(0).getTextContent());
+		assertEquals("127.0.0.1", children.item(0).getTextContent());
 		assertEquals("zr:port", children.item(1).getNodeName());
-		assertEquals("80", children.item(1).getTextContent());
+		assertEquals("8080", children.item(1).getTextContent());
 		assertEquals("zr:database", children.item(2).getNodeName());
 		assertEquals("korapsru", children.item(2).getTextContent());
 		

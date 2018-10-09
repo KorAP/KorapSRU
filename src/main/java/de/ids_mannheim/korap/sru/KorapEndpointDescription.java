@@ -51,19 +51,25 @@ public class KorapEndpointDescription implements EndpointDescription {
     
     public KorapEndpointDescription (ServletContext context)
             throws SRUConfigException {
+        
+        String endpointDesc = context.getInitParameter("de.ids_mannheim.korap.endpointDescription");
+        if (endpointDesc==null || endpointDesc.isEmpty()){
+            endpointDesc = "/WEB-INF/endpoint-description.xml";
+        }
+        
         try {
-            URL url = context.getResource("/WEB-INF/endpoint-description.xml");
-            EndpointDescription simpleEndpointDescription = SimpleEndpointDescriptionParser
-                    .parse(url);
+            URL url = context.getResource(endpointDesc);
+            EndpointDescription simpleEndpointDescription =
+                    SimpleEndpointDescriptionParser.parse(url);
             if (simpleEndpointDescription != null) {
-                setSupportedLayers(simpleEndpointDescription
-                        .getSupportedLayers());
-                setAnnotationLayers(simpleEndpointDescription
-                        .getSupportedLayers());
-                setSupportedDataViews(simpleEndpointDescription
-                        .getSupportedDataViews());
-                setDefaultDataViews(simpleEndpointDescription
-                        .getSupportedDataViews());
+                setSupportedLayers(
+                        simpleEndpointDescription.getSupportedLayers());
+                setAnnotationLayers(
+                        simpleEndpointDescription.getSupportedLayers());
+                setSupportedDataViews(
+                        simpleEndpointDescription.getSupportedDataViews());
+                setDefaultDataViews(
+                        simpleEndpointDescription.getSupportedDataViews());
                 setCapabilities(simpleEndpointDescription.getCapabilities());
             }
 
@@ -76,37 +82,39 @@ public class KorapEndpointDescription implements EndpointDescription {
     }
 
     @Override
-    public void destroy() {
-        dataviews.clear();
-        capabilities.clear();
+    public void destroy () {
+        //dataviews.clear();
+        //capabilities.clear();
+        dataviews = null;
+        capabilities = null;
         languages.clear();
     }
 
-    public void setLanguages() {
+    public void setLanguages () {
         languages = new ArrayList<String>();
         languages.add("deu");
     }
 
     @Override
-    public List<URI> getCapabilities() {
+    public List<URI> getCapabilities () {
         return capabilities;
     }
 
-    public void setCapabilities(List<URI> list) throws SRUConfigException {
+    public void setCapabilities (List<URI> list) throws SRUConfigException {
         capabilities = list;
     }
 
     @Override
-    public List<DataView> getSupportedDataViews() {
+    public List<DataView> getSupportedDataViews () {
         return dataviews;
     }
 
-    public void setSupportedDataViews(List<DataView> list) {
+    public void setSupportedDataViews (List<DataView> list) {
         dataviews = list;
     }
 
     @Override
-    public List<ResourceInfo> getResourceList(String pid) throws SRUException {
+    public List<ResourceInfo> getResourceList (String pid) throws SRUException {
 
         List<ResourceInfo> resourceList = new ArrayList<ResourceInfo>();
 
@@ -116,12 +124,13 @@ public class KorapEndpointDescription implements EndpointDescription {
         JsonNode resources;
 
         try {
-            //resources = KorapSRU.korapClient.retrieveResources();
-            InputStream is = getClass().getClassLoader().getResourceAsStream("resources.json");
-            resources = mapper.readTree(is); 
+            // resources = KorapSRU.korapClient.retrieveResources();
+            InputStream is = getClass().getClassLoader()
+                    .getResourceAsStream("resources.json");
+            resources = mapper.readTree(is);
         }
-        catch ( //URISyntaxException | 
-                IOException e) {
+        catch ( // URISyntaxException |
+        IOException e) {
             throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
                     "Failed retrieving resources.");
         }
@@ -143,11 +152,11 @@ public class KorapEndpointDescription implements EndpointDescription {
         return resourceList;
     }
 
-    public List<String> getDefaultDataViews() {
+    public List<String> getDefaultDataViews () {
         return defaultDataviews;
     }
 
-    public void setDefaultDataViews(List<DataView> supportedDataViews) {
+    public void setDefaultDataViews (List<DataView> supportedDataViews) {
         defaultDataviews = new ArrayList<String>();
         for (DataView d : supportedDataViews) {
             if (d.getDeliveryPolicy() == DeliveryPolicy.SEND_BY_DEFAULT) {
@@ -156,20 +165,20 @@ public class KorapEndpointDescription implements EndpointDescription {
         }
     }
 
-    public void setSupportedLayers(List<Layer> layers) {
+    public void setSupportedLayers (List<Layer> layers) {
         this.layers = layers;
     }
 
     @Override
-    public List<Layer> getSupportedLayers() {
+    public List<Layer> getSupportedLayers () {
         return layers;
     }
 
-    public List<AnnotationLayer> getAnnotationLayers() {
+    public List<AnnotationLayer> getAnnotationLayers () {
         return annotationLayers;
     }
 
-    public void setAnnotationLayers(List<Layer> layers) {
+    public void setAnnotationLayers (List<Layer> layers) {
         annotationLayers = new ArrayList<AnnotationLayer>(layers.size());
 
         String layerCode;
@@ -191,7 +200,8 @@ public class KorapEndpointDescription implements EndpointDescription {
                     if (type.equals(AnnotationLayer.TYPE.POS.toString())) {
                         sb.append("/p");
                     }
-                    else if (type.equals(AnnotationLayer.TYPE.LEMMA.toString())) {
+                    else if (type
+                            .equals(AnnotationLayer.TYPE.LEMMA.toString())) {
                         sb.append("/l");
                     }
                     else {
@@ -201,17 +211,17 @@ public class KorapEndpointDescription implements EndpointDescription {
                 layerCode = sb.toString();
             }
 
-            AnnotationLayer annotationLayer = new AnnotationLayer(layerCode,
-                    l.getResultId());
+            AnnotationLayer annotationLayer =
+                    new AnnotationLayer(layerCode, l.getResultId());
             annotationLayers.add(annotationLayer);
         }
     }
 
-    public Layer getTextLayer() {
+    public Layer getTextLayer () {
         return textLayer;
     }
 
-    public void setTextLayer(Layer textLayer) {
+    public void setTextLayer (Layer textLayer) {
         this.textLayer = textLayer;
     }
 }

@@ -16,25 +16,25 @@
     </SupportedDataViews>
     <SupportedLayers>
         <SupportedLayer id="l1" result-id="http://clarin.ids-mannheim.de/korapsru/layers/text">text</SupportedLayer>
-        <SupportedLayer id="l2" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos1" qualifier="cnx"
+        <SupportedLayer id="l2" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos/cnx" qualifier="cnx"
         	alt-value-info="based on STTS tagset"
         	alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
-        <SupportedLayer id="l3" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos2" qualifier="tt"
+        <SupportedLayer id="l3" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos/tt" qualifier="tt"
             alt-value-info="based on STTS tagset"
             alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
-        <SupportedLayer id="l4" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos3" qualifier="opennlp"
+        <SupportedLayer id="l4" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos/opennlp" qualifier="opennlp"
             alt-value-info="based on STTS tagset"
             alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>
-       <SupportedLayer id="l5" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos4" qualifier="mate"
+       <SupportedLayer id="l5" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos/mate" qualifier="mate"
             alt-value-info="based on STTS tagset"
             alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>        
-        <SupportedLayer id="l6" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos5" qualifier="xip"
+        <SupportedLayer id="l6" result-id="http://clarin.ids-mannheim.de/korapsru/layers/pos/xip" qualifier="xip"
             alt-value-info="based on STTS tagset"
             alt-value-info-uri="http://www.ims.uni-stuttgart.de/forschung/ressourcen/lexika/TagSets/stts-table.html">pos</SupportedLayer>       
-        <SupportedLayer id="l7" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma1" qualifier="cnx">lemma</SupportedLayer>
-        <SupportedLayer id="l8" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma2" qualifier="tt">lemma</SupportedLayer>
-        <SupportedLayer id="l9" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma3" qualifier="mate">lemma</SupportedLayer>
-        <SupportedLayer id="l10" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma4" qualifier="xip">lemma</SupportedLayer>
+        <SupportedLayer id="l7" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma/cnx" qualifier="cnx">lemma</SupportedLayer>
+        <SupportedLayer id="l8" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma/tt" qualifier="tt">lemma</SupportedLayer>
+        <SupportedLayer id="l9" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma/mate" qualifier="mate">lemma</SupportedLayer>
+        <SupportedLayer id="l10" result-id="http://clarin.ids-mannheim.de/korapsru/layers/lemma/xip" qualifier="xip">lemma</SupportedLayer>
     </SupportedLayers>
     <Resources>
      	<Resource pid="dummy pid">

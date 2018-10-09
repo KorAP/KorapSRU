@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  * @author margaretha
  *
  */
-public class FCSQLRequestTest {
+public class FCSQLRequestTest extends KorapJerseyTest {
 
     private String korapSruUri = "http://localhost:8080/KorapSRU";
     private static DocumentBuilder documentBuilder;
