@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * The tests in this class requires running KustvaktServer and KorAPSRU.
+ * The tests in this class require a running KustvaktServer.
  * The results are based on the sample corpus from the Goethe corpus.
  * 
  * Specify the Kustvakt service URI at

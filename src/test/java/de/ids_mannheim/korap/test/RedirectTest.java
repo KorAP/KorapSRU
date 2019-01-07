@@ -13,6 +13,14 @@ import org.junit.Test;
 
 import de.ids_mannheim.korap.util.RedirectStrategy;
 
+/**
+ * The test requires a running KustvaktServer.
+ * Specify the Kustvakt service URI at
+ * /KorapSRU/src/main/webapp/WEB-INF/web.xml
+ * 
+ * @author margaretha
+ *
+ */
 public class RedirectTest {
 
     @Test
