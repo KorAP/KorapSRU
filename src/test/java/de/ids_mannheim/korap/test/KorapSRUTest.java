@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -35,8 +36,8 @@ import org.xml.sax.SAXException;
  */
 public class KorapSRUTest extends KorapJerseyTest{
 	private int port = 8080;
-	
-	DocumentBuilder docBuilder;
+	private String host = "localhost";
+	private DocumentBuilder docBuilder;
 	
 	public KorapSRUTest() throws ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -47,7 +48,7 @@ public class KorapSRUTest extends KorapJerseyTest{
 	public void searchRetrieveCQLTest() throws IOException, URISyntaxException, IllegalStateException, SAXException{
 		HttpClient httpclient = HttpClients.createDefault();
 		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost("localhost").setPort(port).setPath("/KorapSRU")
+		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
 				.setParameter("operation", "searchRetrieve")
 				.setParameter("query", "fein");
 		
@@ -61,7 +62,7 @@ public class KorapSRUTest extends KorapJerseyTest{
 	public void searchRetrieveFCSQLTest() throws IOException, URISyntaxException, IllegalStateException, SAXException{
 		HttpClient httpclient = HttpClients.createDefault();
 		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost("localhost").setPort(port).setPath("/KorapSRU")
+		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
 				.setParameter("operation", "searchRetrieve")
 				.setParameter("query", "[tt:lemma=\"fein\"]")
 				.setParameter("queryType", "fcs");
@@ -75,7 +76,8 @@ public class KorapSRUTest extends KorapJerseyTest{
 	private void checkSRUSearchRetrieveResponse(HttpResponse response) throws IllegalStateException, SAXException, IOException {
 		assertEquals(200,response.getStatusLine().getStatusCode());
 		
-		Document doc = docBuilder.parse(response.getEntity().getContent());
+		InputStream is = response.getEntity().getContent();
+		Document doc = docBuilder.parse(is);
 		NodeList nodelist = doc.getElementsByTagName("sruResponse:version");
 		assertEquals("2.0", nodelist.item(0).getTextContent());
 		nodelist = doc.getElementsByTagName("sruResponse:recordSchema");
@@ -106,11 +108,11 @@ public class KorapSRUTest extends KorapJerseyTest{
 //		assertEquals(52, node.getChildNodes().getLength());
 		node = nodelist.item(1);
 		assertEquals("adv:Layers", node.getNodeName());
-		assertEquals(4, node.getChildNodes().getLength());
+//		assertEquals(6, node.getChildNodes().getLength());
 		
-		node = node.getFirstChild();
-		attr = node.getAttributes().getNamedItem("id").getNodeValue();
-		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/pos/opennlp", attr);
+//		node = node.getFirstChild();
+//		attr = node.getAttributes().getNamedItem("id").getNodeValue();
+//		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/pos/marmot", attr);
 //		assertEquals(50, node.getChildNodes().getLength());
 	}
 	
@@ -118,7 +120,7 @@ public class KorapSRUTest extends KorapJerseyTest{
 	public void explainTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
 		HttpClient httpclient = HttpClients.createDefault();
 		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost("localhost").setPort(port).setPath("/KorapSRU")
+		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
 				.setParameter("operation", "explain");
 		
 		URI uri = builder.build();
@@ -180,7 +182,7 @@ public class KorapSRUTest extends KorapJerseyTest{
 	public void explainEndpointDescriptionTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
 		HttpClient httpclient = HttpClients.createDefault();
 		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost("localhost").setPort(port).setPath("/KorapSRU")
+		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
 				.setParameter("operation", "explain")
 				.setParameter("x-fcs-endpoint-description", "true");
 		
@@ -208,11 +210,11 @@ public class KorapSRUTest extends KorapJerseyTest{
 		
 		nodelist = doc.getElementsByTagName("ed:SupportedLayers");
 		children = nodelist.item(0).getChildNodes();
-		assertEquals(10, children.getLength());
+		assertEquals(6, children.getLength());
 		assertEquals("text", children.item(0).getTextContent());
 		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/text", children.item(0).getAttributes().getNamedItem("result-id").getNodeValue());
 		assertEquals("pos", children.item(1).getTextContent());
-		assertEquals("cnx", children.item(1).getAttributes().getNamedItem("qualifier").getNodeValue());
+		assertEquals("corenlp", children.item(1).getAttributes().getNamedItem("qualifier").getNodeValue());
 		
 		
 		nodelist = doc.getElementsByTagName("ed:Resource");

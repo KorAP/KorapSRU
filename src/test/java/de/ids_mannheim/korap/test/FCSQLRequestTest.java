@@ -62,8 +62,8 @@ public class FCSQLRequestTest extends KorapJerseyTest {
         builder.addParameters(params);
 
         URI uri = builder.build();
-        assertEquals(
-                "http://localhost:8080/KorapSRU?operation=startRetrieve&query=%5Btt%3Alemma%3D%22.*bar%22%5D&queryType=fcs",
+        assertEquals(korapSruUri + "?operation=startRetrieve&query="
+                + "%5Btt%3Alemma%3D%22.*bar%22%5D&queryType=fcs",
                 uri.toString());
 
         HttpGet request = new HttpGet(uri);
@@ -94,8 +94,8 @@ public class FCSQLRequestTest extends KorapJerseyTest {
         builder.addParameters(params);
 
         URI uri = builder.build();
-        assertEquals(
-                "http://localhost:8080/KorapSRU?operation=startRetrieve&query=%5Blemma%3D%22.*bar%22%5D&queryType=fcs",
+        assertEquals(korapSruUri + "?operation=startRetrieve&query=%5Blemma"
+                + "%3D%22.*bar%22%5D&queryType=fcs",
                 uri.toString());
 
         HttpGet request = new HttpGet(uri);

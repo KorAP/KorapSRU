@@ -36,8 +36,8 @@ import eu.clarin.sru.server.fcs.XMLStreamWriterHelper;
  */
 public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
-    private Logger logger = (Logger) LoggerFactory
-            .getLogger(KorapSRUSearchResultSet.class);
+    private Logger logger =
+            LoggerFactory.getLogger(KorapSRUSearchResultSet.class);
 
     private int i = -1;
     private KorapResult korapResult;
@@ -226,20 +226,30 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
                     continue;
                 }
 
-                // FCS advanced dataview does not allow multiple
-                // annotations on the same segment.
-                // for (Annotation annotation : annotations){
-                Annotation annotation = annotations.get(0);
-
-                if (annotation.getHitLevel() > 0) {
-                    helper.addSpan(annotationLayer.getLayerId(),
-                            annotation.getStart(), annotation.getEnd(),
-                            annotation.getValue(), annotation.getHitLevel());
-                }
-                else {
-                    helper.addSpan(annotationLayer.getLayerId(),
-                            annotation.getStart(), annotation.getEnd(),
-                            annotation.getValue());
+                
+                 for (Annotation annotation : annotations){
+                    try {
+                        if (annotation.getHitLevel() > 0) {
+                            helper.addSpan(annotationLayer.getLayerId(),
+                                    annotation.getStart(), annotation.getEnd(),
+                                    annotation.getValue(), annotation.getHitLevel());
+                        }
+                        else {
+                            helper.addSpan(annotationLayer.getLayerId(),
+                                    annotation.getStart(), annotation.getEnd(),
+                                    annotation.getValue());
+                        }
+                    }
+                    catch (Exception e) {
+                        logger.error(e.getMessage());
+                        continue;
+                    }
+                    
+                    // FCS advanced dataview does not allow multiple
+                    // annotations on the same segment.
+                    if (!annotationLayer.getLayerCode().equals("text")){
+                        break;
+                    }
                 }
             }
             map.clear();
