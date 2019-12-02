@@ -116,6 +116,22 @@ public class KorapSRUTest extends KorapJerseyTest{
 //		assertEquals(50, node.getChildNodes().getLength());
 	}
 	
+	
+	@Test
+    public void searchRetrieveWithResourceId() throws IOException, URISyntaxException, IllegalStateException, SAXException{
+        HttpClient httpclient = HttpClients.createDefault();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
+                .setParameter("operation", "searchRetrieve")
+                .setParameter("query", "fein")
+                .setParameter("x-fcs-context", "GOE");
+        
+        URI uri = builder.build();
+        HttpGet request = new HttpGet(uri);
+        HttpResponse response = httpclient.execute(request);
+        checkSRUSearchRetrieveResponse(response);
+    } 
+	
 	@Test
 	public void explainTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
 		HttpClient httpclient = HttpClients.createDefault();

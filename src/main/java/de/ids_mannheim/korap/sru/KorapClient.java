@@ -162,7 +162,7 @@ public class KorapClient {
         HttpUriRequest httpRequest = null;
         try {
             httpRequest = createSearchRequest(query, queryLanguage, version,
-                    startRecord - 1, maximumRecords);
+                    startRecord - 1, maximumRecords, corpora);
         }
         catch (URISyntaxException e) {
             throw new IOException("Failed creating http request.");
@@ -172,6 +172,8 @@ public class KorapClient {
         KorapResult result = null;
         try {
             response = sendRequest(httpRequest);
+//            logger.info(response.toString());
+            
             BufferedInputStream jsonStream =
                     new BufferedInputStream(response.getEntity().getContent());
             try {
@@ -256,12 +258,13 @@ public class KorapClient {
      *            the starting number of records/matches to return
      * @param maximumRecords
      *            the number of maximum records to return
+     * @param corpora 
      * @return a HttpGet request
      * @throws URISyntaxException
      */
     private HttpGet createSearchRequest (String query,
             QueryLanguage queryLanguage, String version, int startRecord,
-            int maximumRecords) throws URISyntaxException {
+            int maximumRecords, String[] corpora) throws URISyntaxException {
 
         if (maximumRecords <= 0) {
             maximumRecords = defaultNumOfRecords;
@@ -271,10 +274,24 @@ public class KorapClient {
                     defaultMaxRecords);
             maximumRecords = defaultMaxRecords;
         }
+        
+        String corpusQuery = "";
+        int length = corpora.length;
+        if (corpora != null && length > 0){
+            for (int i=0; i<length; i++){
+                corpusQuery += "corpusSigle="+corpora[i];
+                if (i != length-1){
+                    corpusQuery += "|";
+                }
+            }
+        }
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("q", query));
         params.add(new BasicNameValuePair("ql", queryLanguage.toString()));
+        if (!corpusQuery.isEmpty()){
+            params.add(new BasicNameValuePair("cq", corpusQuery));
+        }
         params.add(new BasicNameValuePair("v", version));
         params.add(new BasicNameValuePair("context", DEFAULT_CONTEXT_TYPE));
         params.add(new BasicNameValuePair("count",
@@ -359,6 +376,7 @@ public class KorapClient {
                         + "</snippet>";
             }
             catch (IOException e) {
+                logger.error(e.getMessage());
                 throw new IOException(
                         "Failed processing response from KorAP match info API.");
             }

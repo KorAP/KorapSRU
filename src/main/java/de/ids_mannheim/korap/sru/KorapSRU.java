@@ -88,7 +88,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
             throw new SRUException(SRUConstants.SRU_UNSUPPORTED_PARAMETER_VALUE, 
                     "Query type "+ queryType+ " is not supported.");
         }
-        logger.info("Query language: " + queryType);
+//        logger.info("Query language: " + queryType);
         
         SRUVersion sruVersion = request.getVersion();
         // EM: actually not necessary because query type is only available in SRU 2.0
@@ -104,13 +104,13 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
             throw new SRUException(SRUConstants.SRU_EMPTY_TERM_UNSUPPORTED,
                     "Empty term is not supported.");
         }
-        logger.info("korapsru query: " + queryStr);
+//        logger.info("korapsru query: " + queryStr);
 
         KorapResult korapResult = sendQuery(queryStr, request, version,
                 queryLanguage);
         checkKorapResultError(korapResult, queryLanguage,
                 isRewitesAllowed(request), diagnostics);
-        logger.info("Number of records: "+korapResult.getTotalResults());
+//        logger.info("Number of records: "+korapResult.getTotalResults());
 
         return new KorapSRUSearchResultSet(korapClient, diagnostics, korapResult, dataviews,
                 korapEndpointDescription.getTextLayer(),
@@ -335,6 +335,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
     private String[] getCorporaList(SRURequest request) {
         try {
             String corpusPids = request.getExtraRequestData("x-fcs-context");
+//            logger.info("x-fcs-context: "+corpusPids);
             if (!corpusPids.isEmpty() && corpusPids != null) {
                 if (corpusPids.contains(",")) {
                     return corpusPids.split(",");
