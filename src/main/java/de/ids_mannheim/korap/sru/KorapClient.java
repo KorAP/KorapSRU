@@ -276,11 +276,10 @@ public class KorapClient {
         }
         
         String corpusQuery = "";
-        int length = corpora.length;
-        if (corpora != null && length > 0){
-            for (int i=0; i<length; i++){
-                corpusQuery += "corpusSigle="+corpora[i];
-                if (i != length-1){
+        if (corpora != null && corpora.length > 0) {
+            for (int i = 0; i < corpora.length; i++) {
+                corpusQuery += "corpusSigle=" + corpora[i];
+                if (i != corpora.length - 1) {
                     corpusQuery += "|";
                 }
             }
