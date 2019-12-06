@@ -4,25 +4,21 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 /**
  * The tests are based on the sample corpus from the Goethe corpus.
@@ -35,8 +31,6 @@ import org.xml.sax.SAXException;
  *
  */
 public class KorapSRUTest extends KorapJerseyTest{
-	private int port = 8080;
-	private String host = "localhost";
 	private DocumentBuilder docBuilder;
 	
 	public KorapSRUTest() throws ParserConfigurationException {
@@ -45,57 +39,52 @@ public class KorapSRUTest extends KorapJerseyTest{
 	}
 	
 	@Test
-	public void searchRetrieveCQLTest() throws IOException, URISyntaxException, IllegalStateException, SAXException{
-		HttpClient httpclient = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
-				.setParameter("operation", "searchRetrieve")
-				.setParameter("query", "fein");
-		
-		URI uri = builder.build();
-		HttpGet request = new HttpGet(uri);
-		HttpResponse response = httpclient.execute(request);
-		checkSRUSearchRetrieveResponse(response);
+	public void searchRetrieveCQLTest() throws IOException, SAXException{
+	    ClientResponse response = resource().queryParam("operation", "searchRetrieve")
+                .queryParam("query", "fein")
+                .get(ClientResponse.class);
+        
+	    InputStream entity = response.getEntity(InputStream.class);
+        checkSRUSearchRetrieveResponse(entity);
 	} 
 	
 	@Test
-	public void searchRetrieveFCSQLTest() throws IOException, URISyntaxException, IllegalStateException, SAXException{
-		HttpClient httpclient = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
-				.setParameter("operation", "searchRetrieve")
-				.setParameter("query", "[tt:lemma=\"fein\"]")
-				.setParameter("queryType", "fcs");
-		
-		URI uri = builder.build();
-		HttpGet request = new HttpGet(uri);
-		HttpResponse response = httpclient.execute(request);
-		checkSRUSearchRetrieveResponse(response);
+	public void searchRetrieveFCSQLTest() throws IOException, SAXException{
+	    ClientResponse response = resource().queryParam("operation", "searchRetrieve")
+                .queryParam("query", "[tt:lemma=\"fein\"]")
+                .queryParam("queryType", "fcs")
+                .queryParam("maximumRecords", "5")
+                .get(ClientResponse.class);
+        
+//	    String entity = response.getEntity(String.class);
+//	    System.out.println(entity);
+//	    ByteArrayInputStream bis = new ByteArrayInputStream(entity.getBytes());
+//	    checkSRUSearchRetrieveResponse(bis);
+	    
+        InputStream entity = response.getEntity(InputStream.class);
+		checkSRUSearchRetrieveResponse(entity);
 	} 
 	
-	private void checkSRUSearchRetrieveResponse(HttpResponse response) throws IllegalStateException, SAXException, IOException {
-		assertEquals(200,response.getStatusLine().getStatusCode());
+	private void checkSRUSearchRetrieveResponse(InputStream entity) throws SAXException, IOException {
 		
-		InputStream is = response.getEntity().getContent();
-		Document doc = docBuilder.parse(is);
+		Document doc = docBuilder.parse(entity);
+		
 		NodeList nodelist = doc.getElementsByTagName("sruResponse:version");
 		assertEquals("2.0", nodelist.item(0).getTextContent());
 		nodelist = doc.getElementsByTagName("sruResponse:recordSchema");
 		assertEquals("http://clarin.eu/fcs/resource", nodelist.item(0).getTextContent());
 		
-		nodelist = doc.getElementsByTagName("fcs:Resource");
-		String attr  = nodelist.item(0).getAttributes().getNamedItem("pid").getNodeValue();
-//		assertEquals("match-GOE/AGF/00000-p15205-15206", attr);
+		NodeList resources = doc.getElementsByTagName("fcs:Resource");
+		String attr  = resources.item(0).getAttributes().getNamedItem("pid").getNodeValue();
 		
 		nodelist = doc.getElementsByTagName("fcs:DataView");
 		attr = nodelist.item(0).getAttributes().getNamedItem("type").getNodeValue();
 		assertEquals("application/x-clarin-fcs-hits+xml", attr);
+		
 		Node node = nodelist.item(0).getFirstChild();
 		assertEquals("hits:Result", node.getNodeName());
-		
 		NodeList children = node.getChildNodes();
 		assertEquals("hits:Hit", children.item(1).getNodeName());
-//		assertEquals("feineren", children.item(1).getTextContent());
 		
 		attr = nodelist.item(1).getAttributes().getNamedItem("type").getNodeValue();
 		assertEquals("application/x-clarin-fcs-adv+xml", attr);
@@ -105,47 +94,53 @@ public class KorapSRUTest extends KorapJerseyTest{
 		nodelist = node.getChildNodes();
 		node = nodelist.item(0);
 		assertEquals("adv:Segments", node.getNodeName());
-//		assertEquals(52, node.getChildNodes().getLength());
 		node = nodelist.item(1);
 		assertEquals("adv:Layers", node.getNodeName());
-//		assertEquals(6, node.getChildNodes().getLength());
 		
-//		node = node.getFirstChild();
-//		attr = node.getAttributes().getNamedItem("id").getNodeValue();
-//		assertEquals("http://clarin.ids-mannheim.de/korapsru/layers/pos/marmot", attr);
-//		assertEquals(50, node.getChildNodes().getLength());
+		checkSegmentPosition(resources);
 	}
 	
 	
-	@Test
+	private void checkSegmentPosition (NodeList resources) {
+        // dataviews
+        NodeList childNodes = resources.item(1).getFirstChild().getChildNodes();
+        // segments
+        childNodes = childNodes.item(1).getFirstChild().getChildNodes().item(0)
+                .getChildNodes();
+
+        Node node = childNodes.item(0);
+        // 1st Segment
+        assertEquals("adv:Segment", node.getNodeName());
+        assertEquals("0",
+                node.getAttributes().getNamedItem("start").getNodeValue());
+
+        // 4th segment
+        node = childNodes.item(3);
+        assertEquals("0",
+                node.getAttributes().getNamedItem("start").getNodeValue());
+    }
+
+    @Test
     public void searchRetrieveWithResourceId() throws IOException, URISyntaxException, IllegalStateException, SAXException{
-        HttpClient httpclient = HttpClients.createDefault();
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
-                .setParameter("operation", "searchRetrieve")
-                .setParameter("query", "fein")
-                .setParameter("x-fcs-context", "GOE");
+	    ClientResponse response = resource().queryParam("operation", "searchRetrieve")
+                .queryParam("query", "fein")
+                .queryParam("x-fcs-context", "GOE")
+                .get(ClientResponse.class);
         
-        URI uri = builder.build();
-        HttpGet request = new HttpGet(uri);
-        HttpResponse response = httpclient.execute(request);
-        checkSRUSearchRetrieveResponse(response);
+	    InputStream entity = response.getEntity(InputStream.class);
+        checkSRUSearchRetrieveResponse(entity);
     } 
 	
 	@Test
 	public void explainTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
-		HttpClient httpclient = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
-				.setParameter("operation", "explain");
+	    ClientResponse response = resource().queryParam("operation", "explain")
+                .get(ClientResponse.class);
+        
+        InputStream entity = response.getEntity(InputStream.class);
+        
+		assertEquals(200,response.getStatus());
 		
-		URI uri = builder.build();
-		HttpGet request = new HttpGet(uri);
-		HttpResponse response = httpclient.execute(request);
-		
-		assertEquals(200,response.getStatusLine().getStatusCode());
-		
-		Document doc = docBuilder.parse(response.getEntity().getContent());
+		Document doc = docBuilder.parse(entity);
 		NodeList nodelist = doc.getElementsByTagName("sruResponse:version");
 		assertEquals("2.0", nodelist.item(0).getTextContent());
 		
@@ -196,19 +191,15 @@ public class KorapSRUTest extends KorapJerseyTest{
 	
 	@Test
 	public void explainEndpointDescriptionTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
-		HttpClient httpclient = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost(host).setPort(port).setPath("/KorapSRU")
-				.setParameter("operation", "explain")
-				.setParameter("x-fcs-endpoint-description", "true");
-		
-		URI uri = builder.build();
-		HttpGet request = new HttpGet(uri);
-		HttpResponse response = httpclient.execute(request);
-		
-		assertEquals(200,response.getStatusLine().getStatusCode());
-		
-		Document doc = docBuilder.parse(response.getEntity().getContent());
+	    ClientResponse response = resource().queryParam("operation", "explain")
+	            .queryParam("x-fcs-endpoint-description", "true")
+                .get(ClientResponse.class);
+        
+        InputStream entity = response.getEntity(InputStream.class);
+        
+        assertEquals(200,response.getStatus());
+        
+        Document doc = docBuilder.parse(entity);
 		NodeList nodelist = doc.getElementsByTagName("ed:EndpointDescription");
 		assertEquals("2", nodelist.item(0).getAttributes().getNamedItem("version").getNodeValue());
 		

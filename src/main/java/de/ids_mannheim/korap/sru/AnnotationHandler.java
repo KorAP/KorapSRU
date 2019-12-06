@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -19,8 +17,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class AnnotationHandler extends DefaultHandler {
 
-    private Logger logger = (Logger) LoggerFactory
-            .getLogger(AnnotationHandler.class);
+//    private Logger logger = (Logger) LoggerFactory
+//            .getLogger(AnnotationHandler.class);
 
     private boolean startSegment = true;
     private boolean startSentence = false;
@@ -163,8 +161,14 @@ public class AnnotationHandler extends DefaultHandler {
         // add a text segment to the text layer
         text = textBuilder.toString();
         textBuilder = new StringBuilder();
-        addAnnotationToMap(text, annotationLayers.get(0), matchLevel,
-                textStartOffset, textEndOffset);
+        if (!text.isEmpty()) {
+            addAnnotationToMap(text, annotationLayers.get(0), matchLevel,
+                    textStartOffset, textEndOffset);
+        }
+        textStartOffset = 0;
+        textEndOffset = 0;
+        segmentStartOffset = 0; 
+        segmentEndOffset = 0;
     }
 
     @Override
