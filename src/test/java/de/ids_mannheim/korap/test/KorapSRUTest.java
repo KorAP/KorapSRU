@@ -43,10 +43,23 @@ public class KorapSRUTest extends KorapJerseyTest{
 	    ClientResponse response = resource().queryParam("operation", "searchRetrieve")
                 .queryParam("query", "fein")
                 .get(ClientResponse.class);
-        
+
 	    InputStream entity = response.getEntity(InputStream.class);
         checkSRUSearchRetrieveResponse(entity);
-	} 
+	}
+	
+	@Test
+    public void searchRetrieveCQLTestWithStartRecord() throws IOException, SAXException{
+        ClientResponse response = resource().queryParam("operation", "searchRetrieve")
+                .queryParam("query", "der")
+                .queryParam("startRecord", "51")
+                .get(ClientResponse.class);
+      InputStream entity = response.getEntity(InputStream.class);
+      Document doc = docBuilder.parse(entity);
+      
+      NodeList nodelist = doc.getElementsByTagName("sruResponse:recordPosition");
+      assertEquals("51", nodelist.item(0).getTextContent());
+    } 
 	
 	@Test
 	public void searchRetrieveFCSQLTest() throws IOException, SAXException{

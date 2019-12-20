@@ -1,7 +1,10 @@
+20/12/2019
+  - Added dynamic acquisition of resource info using KorAP API.
+
 11/07/2019
-   - Updated libraries, resources and endpoint description.
+  - Updated libraries, resources and endpoint description.
 
 07/01/2019
-   - Updated Jackson databind library.
-   - Updated tests' descriptions.
-   - Added change log. 
+  - Updated Jackson databind library.
+  - Updated tests' descriptions.
+  - Added change log.

@@ -78,17 +78,17 @@ public class KorapClient {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public JsonNode retrieveResources ()
+    public KorapResource[] retrieveResources ()
             throws URISyntaxException, IOException {
 
-        URIBuilder builder = new URIBuilder(serviceUri + "Corpus");
+        URIBuilder builder = new URIBuilder(serviceUri + "/resource");
         URI uri = builder.build();
         logger.info("Resource URI: " + uri.toString());
         HttpGet httpRequest = new HttpGet(uri);
 
         CloseableHttpClient client = HttpClients.createDefault();
         CloseableHttpResponse response = null;
-        JsonNode resources = null;
+        KorapResource[] resources = null;
 
         try {
             response = client.execute(httpRequest);
@@ -102,10 +102,9 @@ public class KorapClient {
                         response.getStatusLine().getReasonPhrase());
             }
 
-            BufferedInputStream jsonStream =
-                    new BufferedInputStream(response.getEntity().getContent());
+            InputStream jsonStream = response.getEntity().getContent();
             try {
-                resources = objectMapper.readValue(jsonStream, JsonNode.class);
+                resources = objectMapper.readValue(jsonStream, KorapResource[].class);
             }
             catch (JsonParseException | JsonMappingException e) {
                 throw e;
@@ -298,7 +297,7 @@ public class KorapClient {
         params.add(
                 new BasicNameValuePair("offset", String.valueOf(startRecord)));
 
-        URIBuilder builder = new URIBuilder(serviceUri + "search");
+        URIBuilder builder = new URIBuilder(serviceUri + "/search");
         builder.addParameters(params);
 
         URI uri = builder.build();
@@ -409,7 +408,7 @@ public class KorapClient {
 
         StringBuilder sb = new StringBuilder();
         sb.append(serviceUri);
-        sb.append("corpus/");
+        sb.append("/corpus/");
         sb.append(resourceId);
         sb.append("/");
         sb.append(documentId);

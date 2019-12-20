@@ -1,19 +1,17 @@
 package de.ids_mannheim.korap.sru;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.clarin.sru.server.SRUConfigException;
 import eu.clarin.sru.server.SRUConstants;
@@ -47,7 +45,8 @@ public class KorapEndpointDescription implements EndpointDescription {
     private Layer textLayer;
 
     private List<AnnotationLayer> annotationLayers;
-    private ObjectMapper mapper = new ObjectMapper();
+    
+    public KorapEndpointDescription () {}
     
     public KorapEndpointDescription (ServletContext context)
             throws SRUConfigException {
@@ -118,33 +117,24 @@ public class KorapEndpointDescription implements EndpointDescription {
 
         List<ResourceInfo> resourceList = new ArrayList<ResourceInfo>();
 
-        Map<String, String> title;
         Map<String, String> description;
 
-        JsonNode resources;
-
+        KorapResource[] resources;
         try {
-            // resources = KorapSRU.korapClient.retrieveResources();
-            InputStream is = getClass().getClassLoader()
-                    .getResourceAsStream("resources.json");
-            resources = mapper.readTree(is);
+            resources = KorapSRU.korapClient.retrieveResources();
         }
-        catch ( // URISyntaxException |
-        IOException e) {
+        catch (URISyntaxException | IOException e) {
             throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
                     "Failed retrieving resources.");
         }
 
-        for (JsonNode r : resources) {
-            title = new HashMap<String, String>();
-            title.put("de", r.get("name").asText());
-            title.put("en", r.get("name").asText());
-
+        for (KorapResource r : resources) {
             description = new HashMap<String, String>();
-            description.put("de", r.get("description").asText());
+            description.put("de", r.getDescription());
 
-            ResourceInfo ri = new ResourceInfo(r.get("id").asText(), title,
-                    description, KorapSRU.KORAP_WEB_URL, languages, dataviews,
+            ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
+                    description, KorapSRU.KORAP_WEB_URL,
+                    Arrays.asList(r.getLanguages()), dataviews,
                     this.getSupportedLayers(), null);
             resourceList.add(ri);
         }
