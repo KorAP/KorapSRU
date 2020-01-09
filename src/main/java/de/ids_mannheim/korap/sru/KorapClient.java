@@ -44,8 +44,8 @@ public class KorapClient {
     private static final String DEFAULT_CONTEXT_TYPE = "sentence";
     private static final String DEFAULT_FOUNDRY = "*";
 
-    private int defaultNumOfRecords = 10;
-    private int defaultMaxRecords = 10;
+    private int defaultNumOfRecords = 25;
+    private int defaultMaxRecords = 50;
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static Logger logger =

@@ -91,12 +91,6 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 //        logger.info("Query language: " + queryType);
         
         SRUVersion sruVersion = request.getVersion();
-        // EM: actually not necessary because query type is only available in SRU 2.0
-//        if (!isVersionCorrect(queryType, sruVersion)){
-//            throw new SRUException(SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
-//                    "Query type "+queryType+" "+ "and version "+
-//                     sruVersion.toString() +" do not match.");
-//        }
         String version = parseVersion(sruVersion);
         
         String queryStr = request.getQuery().getRawQuery();
@@ -117,23 +111,6 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                 korapEndpointDescription.getAnnotationLayers());
     }
 
-    private boolean isVersionCorrect (String queryType, SRUVersion version) {
-        if (queryType.equals("fcs")){
-            if (version.equals(SRUVersion.VERSION_2_0)){
-                return true;
-            }
-        }
-        else if(queryType.equals("cql")){
-            if (version.equals(SRUVersion.VERSION_1_1) || 
-                    version.equals(SRUVersion.VERSION_1_2) || 
-                    version.equals(SRUVersion.VERSION_2_0) ){
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
     private String parseVersion(SRUVersion version) throws SRUException {
         if (version == SRUVersion.VERSION_1_1) {
             return "1.1";
