@@ -105,7 +105,8 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
     @Override
     public String getRecordIdentifier() {
-        return korapResult.getMatch(i).getMatchId();
+        return null;
+//        return korapResult.getMatch(i).getMatchId();
     }
 
     @Override

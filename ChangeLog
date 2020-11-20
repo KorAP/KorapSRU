@@ -1,5 +1,6 @@
 20/11/2020
   - Fixed parsing error response from KorAP API and updated tests
+  - Removed RecordIdentifier and updated version.
   
 20/12/2019
   - Added dynamic acquisition of resource info using KorAP API.
