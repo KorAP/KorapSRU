@@ -171,6 +171,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
             saxParser.parse(is, annotationHandler);
         }
         catch (SAXException | IOException | URISyntaxException e) {
+            logger.error(e.getMessage());
             throw new XMLStreamException(e);
         }
 
@@ -200,6 +201,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         if (dataviews.contains("adv")) {
             helper.writeAdvancedDataView(writer);
         }
+        helper.reset();
     }
 
     /**

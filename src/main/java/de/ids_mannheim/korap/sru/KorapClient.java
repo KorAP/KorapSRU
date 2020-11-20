@@ -178,18 +178,20 @@ public class KorapClient {
             try {
                 result = objectMapper.readValue(jsonStream, KorapResult.class);
             }
-            catch (IOException e) {
-                throw new IOException("Failed processing response.");
-            }
+//            catch (IOException e) {
+//                throw new IOException("Failed processing response.");
+//            }
             finally {
                 jsonStream.close();
             }
         }
-        catch (IOException e) {
-            throw new IOException("Failed executing HTTP request.", e);
-        }
+//        catch (IOException e) {
+//            throw new IOException("Failed executing HTTP request.", e);
+//        }
         finally {
-            response.close();
+            if (response != null) {
+                response.close();
+            }
         }
 
         return result;
@@ -225,23 +227,35 @@ public class KorapClient {
 
         InputStream is = response.getEntity().getContent();
         JsonNode node = objectMapper.readTree(is);
-        String message = node.get("error").textValue();
-        String[] errorItems;
-        if (message.contains("SRU diagnostic")) {
-            errorItems = message.split(":", 2);
-            errorItems[0] = errorItems[0].replace("SRU diagnostic ", "");
-            errorItems[1] = errorItems[1].trim();
+        node = node.at("/errors");
+        String errorCode="", errorMessage="";
+        for (int i=0; i<node.size(); i++){
+            errorCode = node.get(i).get(0).asText();
+            errorMessage= node.get(i).get(1).asText();
+            if (errorCode.contains("SRU diagnostic")){
+                errorCode = errorCode.replace("SRU diagnostic ", "");
+            }
+            // see de.ids_mannheim.korap.query.serialize.util.StatusCodes
+            else if (errorCode.equals("301")){
+                errorCode="7"; // Mandatory parameter not supplied
+            }
+            else if (errorCode.equals("302") || errorCode.equals("303")
+                    || errorCode.equals("304") || errorCode.equals("305")) {
+                errorCode = "10"; // Query syntax error
+            }
+            else if (errorCode.equals("399")){
+                errorCode="47"; // Cannot process query; reason unknown 
+            }
+            else if (errorCode.equals("306") || errorCode.equals("307") ){ 
+                errorCode = "6"; // Unsupported parameter value
+            }
+            else{
+                errorCode = "1"; // General system error
+            }
         }
-        else if (message.contains("not a supported query language")) {
-            errorItems = new String[] { "4",
-                    "KorAP does not support the query language." };
-        }
-        else {
-            errorItems = new String[] { "1", message };
-        }
-
-        throw new HttpResponseException(Integer.parseInt(errorItems[0]),
-                errorItems[1]);
+        System.out.println(errorCode +" "+errorMessage);
+        throw new HttpResponseException(Integer.parseInt(errorCode),
+                errorMessage);
     }
 
     /**

@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.http.client.HttpResponseException;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.sru.KorapClient;
 import de.ids_mannheim.korap.sru.KorapMatch;
+import de.ids_mannheim.korap.sru.KorapResource;
 import de.ids_mannheim.korap.sru.KorapResult;
 import de.ids_mannheim.korap.sru.QueryLanguage;
 
@@ -35,7 +33,7 @@ public class KorapClientTest {
     private KorapMatch match;
     
     public KorapClientTest () {
-        c = new KorapClient("http://localhost:8089/api/", 25, 50);
+        c = new KorapClient("http://localhost:8089/api/v1.0", 25, 50);
     }
 
     @Test
@@ -92,12 +90,11 @@ public class KorapClientTest {
 	}
     
     @Test
-    @Ignore
     public void testRetrieveResource () throws HttpResponseException, Exception {
-        JsonNode resources = c.retrieveResources();
-
-        //assertEquals(1, resources.size());
-        assertEquals("Wikipedia 2015", resources.get(0).get("name").asText());
-        assertEquals("Deutsche Wikipedia 2015", resources.get(0).get("description").asText());
+        KorapResource[] resources = c.retrieveResources();
+        assertEquals(3, resources.length);
+        assertEquals("WPD17", resources[0].getResourceId());
+        assertEquals("WDD17", resources[1].getResourceId());
+        assertEquals("WUD17", resources[2].getResourceId());
     }
 }

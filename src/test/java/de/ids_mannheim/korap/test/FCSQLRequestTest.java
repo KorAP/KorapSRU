@@ -2,8 +2,10 @@ package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -62,8 +64,9 @@ public class FCSQLRequestTest extends KorapJerseyTest {
         builder.addParameters(params);
 
         URI uri = builder.build();
-        assertEquals(korapSruUri + "?operation=startRetrieve&query="
-                + "%5Btt%3Alemma%3D%22.*bar%22%5D&queryType=fcs",
+        assertEquals(
+                korapSruUri + "?operation=startRetrieve&query="
+                        + "%5Btt%3Alemma%3D%22.*bar%22%5D&queryType=fcs",
                 uri.toString());
 
         HttpGet request = new HttpGet(uri);
@@ -81,7 +84,7 @@ public class FCSQLRequestTest extends KorapJerseyTest {
         assertEquals("134", nodeList.item(0).getTextContent());
         response.close();
     }
-    
+
     @Test
     public void testLemmaRegex () throws URISyntaxException, IOException,
             SAXException, ParserConfigurationException {
@@ -95,8 +98,7 @@ public class FCSQLRequestTest extends KorapJerseyTest {
 
         URI uri = builder.build();
         assertEquals(korapSruUri + "?operation=startRetrieve&query=%5Blemma"
-                + "%3D%22.*bar%22%5D&queryType=fcs",
-                uri.toString());
+                + "%3D%22.*bar%22%5D&queryType=fcs", uri.toString());
 
         HttpGet request = new HttpGet(uri);
         CloseableHttpClient client = HttpClients.createDefault();
@@ -111,6 +113,45 @@ public class FCSQLRequestTest extends KorapJerseyTest {
                 document.getElementsByTagName("sruResponse:numberOfRecords");
 
         assertEquals("134", nodeList.item(0).getTextContent());
+        response.close();
+    }
+
+    @Test
+    public void testUnsupportedLayer () throws URISyntaxException, IOException,
+            SAXException, ParserConfigurationException {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("operation", "startRetrieve"));
+        params.add(new BasicNameValuePair("query", "[unknown=\"Feuer\"]"));
+        params.add(new BasicNameValuePair("queryType", "fcs"));
+
+        URIBuilder builder = new URIBuilder(korapSruUri);
+        builder.addParameters(params);
+
+        URI uri = builder.build();
+        assertEquals(
+                korapSruUri + "?operation=startRetrieve&query="
+                        + "%5Bword%3D%22Feuer%22%5D&queryType=fcs",
+                uri.toString());
+
+        HttpGet request = new HttpGet(uri);
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+        response = client.execute(request);
+
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        InputStream is = response.getEntity().getContent();
+//        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//        String line = null;
+//        while ((line=br.readLine())!=null){
+//            System.out.println(line); 
+//        }
+        
+        Document document = documentBuilder.parse(is);
+        NodeList nodeList = document.getElementsByTagName("diag:message");
+        assertEquals(
+                "status code: 6, reason phrase: Layer unknown is unsupported.",
+                nodeList.item(0).getTextContent());
         response.close();
     }
 
