@@ -1,0 +1,53 @@
+[
+    {
+        "resourceId": "WPD17",
+        "titles": {
+            "de": "Deutsche Wikipedia Artikel 2017",
+            "en": "German Wikipedia Articles 2017"
+        },
+        "description": "A collection of articles of German Wikipedia from July 1st, 2017.",
+        "languages": ["deu"],
+        "layers": {
+            "18": "marmot/m",
+            "19": "marmot/p",
+            "23": "opennlp/p",
+            "11": "corenlp/p",
+            "27": "tt/l",
+            "28": "tt/p"
+        }
+    },
+    {
+        "resourceId": "WDD17",
+        "titles": {
+            "de": "Deutsche Wikipedia-Diskussionskorpus 2017",
+            "en": "German Wikipedia talk corpus 2017"
+        },
+        "description": "A collection of talk pages of German Wikipedia from July 1st, 2017.",
+        "languages": ["deu"],
+        "layers": {
+            "18": "marmot/m",
+            "19": "marmot/p",
+            "23": "opennlp/p",
+            "11": "corenlp/p",
+            "27": "tt/l",
+            "28": "tt/p"
+        }
+    },
+    {
+        "resourceId": "WUD17",
+        "titles": {
+            "de": "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
+            "en": "German Wikipedia talk corpus 2017"
+        },
+        "description": "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
+        "languages": ["deu"],
+        "layers": {
+            "18": "marmot/m",
+            "19": "marmot/p",
+            "23": "opennlp/p",
+            "11": "corenlp/p",
+            "27": "tt/l",
+            "28": "tt/p"
+        }
+    }
+]

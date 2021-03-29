@@ -27,7 +27,8 @@ public class KorapJerseyTest extends JerseyTest {
                 .initParam("eu.clarin.sru.server.maximumRecords", "50")
                 .contextParam("de.ids_mannheim.korap.endpointDescription",
                         "/src/main/webapp/WEB-INF/endpoint-description.xml")
-                .contextParam("korap.service.uri", "http://localhost:8089/api/v1.0")
+                .contextParam("korap.api.uri", "http://localhost:1080")
+                .contextParam("korap.web.uri", "http://localhost:1080")
                 .build();
     }
 

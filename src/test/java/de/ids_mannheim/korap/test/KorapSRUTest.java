@@ -1,17 +1,27 @@
 package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.Header;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -32,6 +42,20 @@ import com.sun.jersey.api.client.ClientResponse;
  */
 public class KorapSRUTest extends KorapJerseyTest{
 	private DocumentBuilder docBuilder;
+	
+	private ClientAndServer mockServer;
+    private MockServerClient mockClient;
+    
+	@Before
+    public void startMockServer () {
+        mockServer = startClientAndServer(1080);
+        mockClient = new MockServerClient("localhost", mockServer.getPort());
+    }
+	
+	@After
+    public void stopMockServer () {
+        mockServer.stop();
+    }
 	
 	public KorapSRUTest() throws ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -146,6 +170,7 @@ public class KorapSRUTest extends KorapJerseyTest{
 	
 	@Test
 	public void explainTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
+	    
 	    ClientResponse response = resource().queryParam("operation", "explain")
                 .get(ClientResponse.class);
         
@@ -204,6 +229,19 @@ public class KorapSRUTest extends KorapJerseyTest{
 	
 	@Test
 	public void explainEndpointDescriptionTest() throws URISyntaxException, ClientProtocolException, IOException, IllegalStateException, SAXException{
+	    
+	    String korapResources = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "korap-api-responses/resources.json"),
+                StandardCharsets.UTF_8);
+        
+        mockClient.reset()
+        .when(request().withMethod("GET").withPath("/resource"))
+        .respond(response()
+                .withHeader(new Header("Content-Type",
+                        "application/json; charset=utf-8"))
+                .withBody(korapResources).withStatusCode(200));
+        
 	    ClientResponse response = resource().queryParam("operation", "explain")
 	            .queryParam("x-fcs-endpoint-description", "true")
                 .get(ClientResponse.class);
@@ -238,12 +276,15 @@ public class KorapSRUTest extends KorapJerseyTest{
 		
 		
 		nodelist = doc.getElementsByTagName("ed:Resource");
-		for (int i=0; i<nodelist.getLength();i++){
-			if (nodelist.item(i).getAttributes().getNamedItem("pid").equals("GOE")){
-				children = nodelist.item(i).getChildNodes();
-				assertEquals("ed:Title", children.item(0).getNodeName());
-				assertEquals("Goethe", children.item(0).getTextContent());
-			}
-		}
+		assertEquals(3, nodelist.getLength());
+		children = nodelist.item(0).getChildNodes();
+		assertEquals(7, children.getLength());
+		assertEquals("ed:Title", children.item(0).getNodeName());
+		assertEquals("ed:Description", children.item(2).getNodeName());
+		assertEquals("ed:LandingPageURI", children.item(3).getNodeName());
+		assertEquals("ed:Languages", children.item(4).getNodeName());
+		assertEquals("ed:AvailableDataViews", children.item(5).getNodeName());
+		assertEquals("ed:AvailableLayers", children.item(6).getNodeName());
 	}
+	
 }

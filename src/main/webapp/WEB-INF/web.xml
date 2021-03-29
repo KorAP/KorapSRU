@@ -6,9 +6,13 @@
 	<display-name>KorapSRU</display-name>
 
 	<context-param>
-		<param-name>korap.service.uri</param-name>
+		<param-name>korap.api.uri</param-name>
 		<!-- <param-value>http://localhost:8089/api/v1.0/</param-value> -->
 		<param-value>https://korap.ids-mannheim.de/api/v1.0</param-value>
+	</context-param>
+	<context-param>
+		<param-name>korap.web.uri</param-name>
+		<param-value>https://korap.ids-mannheim.de</param-value>
 	</context-param>
 
 	<servlet>

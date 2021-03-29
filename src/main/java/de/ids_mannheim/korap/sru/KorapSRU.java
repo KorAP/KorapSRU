@@ -33,8 +33,8 @@ import eu.clarin.sru.server.fcs.SimpleEndpointSearchEngineBase;
 public class KorapSRU extends SimpleEndpointSearchEngineBase {
 
     public static final String CLARIN_FCS_RECORD_SCHEMA = "http://clarin.eu/fcs/resource";
-    public static final String KORAP_WEB_URL = "https://korap.ids-mannheim.de/";
 
+    public static String korapWebUri;
     public static String redirectBaseURI;
     public static KorapClient korapClient;
     private KorapEndpointDescription korapEndpointDescription;
@@ -55,9 +55,10 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
             SRUQueryParserRegistry.Builder parserRegistryBuilder,
             Map<String, String> params) throws SRUConfigException {
 
-        String korapURI = context.getInitParameter("korap.service.uri");
-
-        korapClient = new KorapClient(korapURI,
+        korapWebUri = context.getInitParameter("korap.web.uri");
+        
+        String korapApiUri = context.getInitParameter("korap.api.uri");
+        korapClient = new KorapClient(korapApiUri,
                 config.getNumberOfRecords(),
                 config.getMaximumRecords());
 
@@ -70,7 +71,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
         }
         sb.append("/").append(config.getDatabase());
         sb.append("/").append("redirect/");
-        this.redirectBaseURI = sb.toString();
+        redirectBaseURI = sb.toString();
     }
 
     @Override

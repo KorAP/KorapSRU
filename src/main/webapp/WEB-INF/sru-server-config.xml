@@ -5,8 +5,8 @@
         <title xml:lang="en" primary="true">KorAP</title>
         <description xml:lang="de">Suche mit KorAP via SRU.</description>
         <description xml:lang="en" primary="true">Search in KorAP via SRU.</description>
-        <author xml:lang="en">Institute for the German language</author>
-        <author xml:lang="de" primary="true">Institut für Deutsche Sprache</author>     
+        <author xml:lang="en">Leibniz institute for the German language</author>
+        <author xml:lang="de" primary="true">Leibniz Institut für Deutsche Sprache</author>     
     </databaseInfo>
     
     <indexInfo>
