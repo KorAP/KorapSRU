@@ -1,0 +1,16 @@
+{
+    "meta": {
+        "count": 1,
+        "context": "sentence",
+        "startIndex": 0,
+        "snippets": true,
+        "timeout": 10000
+    },
+    "@context": "http://korap.ids-mannheim.de/ns/koral/0.3/context.jsonld",
+    "errors": [
+        [
+            306,
+            "Layer unknown is unsupported."
+        ]
+    ]
+}

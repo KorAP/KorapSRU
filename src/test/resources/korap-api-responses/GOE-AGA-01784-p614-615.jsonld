@@ -1,0 +1,25 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {"version": "Krill-0.59.3"},
+    "snippet": "<span class=\"context-left\"><span class=\"more\"><\/span><\/span><span class=\"match\"><mark>wunderbar<\/mark><\/span><span class=\"context-right\"><span class=\"more\"><\/span><\/span>",
+    "matchID": "match-GOE/AGA/01784-p614-615",
+    "textSigle": "GOE/AGA/01784",
+    "author": "Goethe, Johann Wolfgang von",
+    "docSigle": "GOE/AGA",
+    "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+    "pubPlace": "München",
+    "availability": "CC-BY-SA",
+    "title": "Belagerung von Mainz",
+    "pubDate": "1982",
+    "corpusSigle": "GOE",
+    "context": {
+        "left": [
+            "token",
+            0
+        ],
+        "right": [
+            "token",
+            0
+        ]
+    }
+}

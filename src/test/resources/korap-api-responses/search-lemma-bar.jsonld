@@ -1,0 +1,72 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {
+        "count": 1,
+        "startIndex": 0,
+        "timeout": 10000,
+        "context": "base/s:s",
+        "fields": [
+            "ID",
+            "UID",
+            "textSigle",
+            "corpusID",
+            "author",
+            "title",
+            "subTitle",
+            "textClass",
+            "pubPlace",
+            "pubDate",
+            "availability",
+            "layerInfos",
+            "docSigle",
+            "corpusSigle"
+        ],
+        "version": "0.59.3",
+        "benchmark": "58.229914 ms",
+        "totalResults": 132,
+        "serialQuery": "SpanMultiTermQueryWrapper(tokens:/tt/l:.*bar/)",
+        "itemsPerPage": 1
+    },
+    "query": {
+        "@type": "koral:token",
+        "wrap": {
+            "@type": "koral:term",
+            "key": ".*bar",
+            "foundry": "tt",
+            "layer": "l",
+            "type": "type:regex",
+            "match": "match:eq"
+        }
+    },
+    "collection": {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": "CC-BY.*",
+        "key": "availability",
+        "rewrites": [
+            {
+                "@type": "koral:rewrite",
+                "src": "Kustvakt",
+                "operation": "operation:insertion",
+                "scope": "availability(FREE)"
+            }
+        ]
+    },
+    "matches": [
+        {
+            "snippet": "<span class=\"context-left\"><\/span><span class=\"match\"><mark>wunderbar<\/mark><\/span><span class=\"context-right\"> genug sah man diese Prophezeiung nicht etwa nur dem allgemeinen Sinn, sondern dem besondern Buchstaben nach genau erfüllt, indem die Franzosen ihren Kalender von diesen Tagen an datierten.<\/span>",
+            "matchID": "match-GOE/AGA/01784-p614-615",
+            "UID": 0,
+            "textSigle": "GOE/AGA/01784",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGA",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Belagerung von Mainz",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        }
+    ]
+}

@@ -25,9 +25,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class BaseTest extends KorapJerseyTest {
-    
+
     protected DocumentBuilder docBuilder;
-    protected DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    protected DocumentBuilderFactory factory =
+            DocumentBuilderFactory.newInstance();
 
     protected ClientAndServer mockServer;
     protected MockServerClient mockClient;
@@ -42,16 +43,17 @@ public class BaseTest extends KorapJerseyTest {
     public void stopMockServer () {
         mockServer.stop();
     }
-    
-    protected void createExpectationForSearchLemmaFein () throws IOException {
+
+    protected void createExpectationForSearch (String query,
+            String jsonFilename) throws IOException {
         String searchResult = IOUtils.toString(
                 ClassLoader.getSystemResourceAsStream(
-                        "korap-api-responses/search-lemma-fein.jsonld"),
+                        "korap-api-responses/"+jsonFilename),
                 StandardCharsets.UTF_8);
 
         mockClient.reset()
                 .when(request().withMethod("GET").withPath("/search")
-                        .withQueryStringParameter("q", "[tt:lemma=\"fein\"]")
+                        .withQueryStringParameter("q", query)
                         .withQueryStringParameter("ql", "fcsql")
                         .withQueryStringParameter("v", "2.0")
                         .withQueryStringParameter("context", "sentence")
@@ -62,8 +64,27 @@ public class BaseTest extends KorapJerseyTest {
                                 "application/json; charset=utf-8"))
                         .withBody(searchResult).withStatusCode(200));
     }
-    
-    protected void createExpectationForMatchInfoLemmaFein() throws IOException{
+
+    protected void createExpectationForMatchInfoLemmaBar () throws IOException {
+        String matchInfoResult = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "korap-api-responses/GOE-AGA-01784-p614-615.jsonld"),
+                StandardCharsets.UTF_8);
+
+        mockClient
+                .when(request().withMethod("GET")
+                        .withPath("/corpus/GOE/AGA/01784/p614-615/matchInfo")
+                        .withQueryStringParameter("foundry", "*")
+                        .withQueryStringParameter("spans", "false"))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(matchInfoResult).withStatusCode(200));
+    }
+
+
+    protected void createExpectationForMatchInfoLemmaFein ()
+            throws IOException {
         String matchInfoResult = IOUtils.toString(
                 ClassLoader.getSystemResourceAsStream(
                         "korap-api-responses/GOE-AGF-00000-p4276-4277.jsonld"),
@@ -80,7 +101,7 @@ public class BaseTest extends KorapJerseyTest {
                         .withBody(matchInfoResult).withStatusCode(200));
     }
 
-    protected void checkSRUSearchRetrieveResponse (InputStream entity)
+    protected Document checkSRUSearchRetrieveResponse (InputStream entity)
             throws SAXException, IOException, ParserConfigurationException {
 
         docBuilder = factory.newDocumentBuilder();
@@ -121,6 +142,7 @@ public class BaseTest extends KorapJerseyTest {
         assertEquals("adv:Layers", node.getNodeName());
 
         checkSegmentPosition(resources);
+        return doc;
     }
 
     protected void checkSegmentPosition (NodeList resources) {

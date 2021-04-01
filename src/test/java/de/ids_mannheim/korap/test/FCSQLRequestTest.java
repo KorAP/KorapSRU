@@ -2,45 +2,28 @@ package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.sun.jersey.api.client.ClientResponse;
+
 /**
- * The tests in this class require a running KustvaktServer.
- * The results are based on the sample corpus from the Goethe corpus.
- * 
- * Specify the Kustvakt service URI at
- * /KorapSRU/src/main/webapp/WEB-INF/web.xml
- * 
  * @author margaretha
  *
  */
-public class FCSQLRequestTest extends KorapJerseyTest {
+public class FCSQLRequestTest extends BaseTest {
 
-    private String korapSruUri = "http://localhost:8080/KorapSRU";
     private static DocumentBuilder documentBuilder;
 
     @BeforeClass
@@ -53,106 +36,68 @@ public class FCSQLRequestTest extends KorapJerseyTest {
     }
 
     @Test
-    public void testFCSQuery () throws URISyntaxException, IOException,
-            SAXException, ParserConfigurationException {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("operation", "startRetrieve"));
-        params.add(new BasicNameValuePair("query", "[tt:lemma=\".*bar\"]"));
-        params.add(new BasicNameValuePair("queryType", "fcs"));
-
-        URIBuilder builder = new URIBuilder(korapSruUri);
-        builder.addParameters(params);
-
-        URI uri = builder.build();
-        assertEquals(
-                korapSruUri + "?operation=startRetrieve&query="
-                        + "%5Btt%3Alemma%3D%22.*bar%22%5D&queryType=fcs",
-                uri.toString());
-
-        HttpGet request = new HttpGet(uri);
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        response = client.execute(request);
-
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        InputStream is = response.getEntity().getContent();
-        Document document = documentBuilder.parse(is);
-        NodeList nodeList =
-                document.getElementsByTagName("sruResponse:numberOfRecords");
-
-        assertEquals("134", nodeList.item(0).getTextContent());
-        response.close();
-    }
-
-    @Test
     public void testLemmaRegex () throws URISyntaxException, IOException,
             SAXException, ParserConfigurationException {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("operation", "startRetrieve"));
-        params.add(new BasicNameValuePair("query", "[lemma=\".*bar\"]"));
-        params.add(new BasicNameValuePair("queryType", "fcs"));
 
-        URIBuilder builder = new URIBuilder(korapSruUri);
-        builder.addParameters(params);
+        createExpectationForSearch("[tt:lemma=\".*bar\"]",
+                "search-lemma-bar.jsonld");
+        createExpectationForMatchInfoLemmaBar();
 
-        URI uri = builder.build();
-        assertEquals(korapSruUri + "?operation=startRetrieve&query=%5Blemma"
-                + "%3D%22.*bar%22%5D&queryType=fcs", uri.toString());
+        ClientResponse response = resource()
+                .queryParam("operation", "searchRetrieve")
+                .queryParam("query", "[tt:lemma=\".*bar\"]")
+                .queryParam("queryType", "fcs")
+                .queryParam("maximumRecords", "1").get(ClientResponse.class);
 
-        HttpGet request = new HttpGet(uri);
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        response = client.execute(request);
+        InputStream entity = response.getEntity(InputStream.class);
+        Document doc = checkSRUSearchRetrieveResponse(entity);
 
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        InputStream is = response.getEntity().getContent();
-        Document document = documentBuilder.parse(is);
         NodeList nodeList =
-                document.getElementsByTagName("sruResponse:numberOfRecords");
+                doc.getElementsByTagName("sruResponse:numberOfRecords");
 
-        assertEquals("134", nodeList.item(0).getTextContent());
-        response.close();
+        assertEquals("132", nodeList.item(0).getTextContent());
+
     }
 
     @Test
     public void testUnsupportedLayer () throws URISyntaxException, IOException,
             SAXException, ParserConfigurationException {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("operation", "startRetrieve"));
-        params.add(new BasicNameValuePair("query", "[unknown=\"Feuer\"]"));
-        params.add(new BasicNameValuePair("queryType", "fcs"));
 
-        URIBuilder builder = new URIBuilder(korapSruUri);
-        builder.addParameters(params);
+        createExpectationForSearch("[unknown=\"fein\"]", "unknownLayer.jsonld");
 
-        URI uri = builder.build();
-        assertEquals(
-                korapSruUri + "?operation=startRetrieve&query="
-                        + "%5Bword%3D%22Feuer%22%5D&queryType=fcs",
-                uri.toString());
+        ClientResponse response = resource()
+                .queryParam("operation", "searchRetrieve")
+                .queryParam("query", "[unknown=\"fein\"]")
+                .queryParam("queryType", "fcs")
+                .queryParam("maximumRecords", "1").get(ClientResponse.class);
 
-        HttpGet request = new HttpGet(uri);
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        response = client.execute(request);
+        InputStream is = response.getEntity(InputStream.class);
 
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        InputStream is = response.getEntity().getContent();
-//        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//        String line = null;
-//        while ((line=br.readLine())!=null){
-//            System.out.println(line); 
-//        }
-        
         Document document = documentBuilder.parse(is);
         NodeList nodeList = document.getElementsByTagName("diag:message");
-        assertEquals(
-                "status code: 6, reason phrase: Layer unknown is unsupported.",
+        assertEquals("Layer unknown is unsupported.",
                 nodeList.item(0).getTextContent());
         response.close();
     }
 
+    @Test
+    public void testUnsupportedQualifer () throws URISyntaxException,
+            IOException, SAXException, ParserConfigurationException {
+        createExpectationForSearch("[unknown:lemma=\"fein\"]",
+                "unknownQualifier.jsonld");
+
+        ClientResponse response = resource()
+                .queryParam("operation", "searchRetrieve")
+                .queryParam("query", "[unknown:lemma=\"fein\"]")
+                .queryParam("queryType", "fcs")
+                .queryParam("maximumRecords", "1").get(ClientResponse.class);
+
+        InputStream is = response.getEntity(InputStream.class);
+
+        Document document = documentBuilder.parse(is);
+        NodeList nodeList = document.getElementsByTagName("diag:message");
+        assertEquals("Qualifier unknown is unsupported.",
+                nodeList.item(0).getTextContent());
+        response.close();
+    }
 }

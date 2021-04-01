@@ -139,7 +139,8 @@ public class KorapSRUTest extends BaseTest {
     public void searchRetrieveFCSQLTest ()
             throws IOException, SAXException, ParserConfigurationException {
 
-        createExpectationForSearchLemmaFein();
+        createExpectationForSearch("[tt:lemma=\"fein\"]",
+                "search-lemma-fein.jsonld");
         createExpectationForMatchInfoLemmaFein();
 
         ClientResponse response = resource()
