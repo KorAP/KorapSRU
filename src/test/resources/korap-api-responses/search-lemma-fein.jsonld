@@ -1,0 +1,73 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {
+        "count": 1,
+        "startIndex": 0,
+        "timeout": 10000,
+        "context": "base/s:s",
+        "fields": [
+            "ID",
+            "UID",
+            "textSigle",
+            "corpusID",
+            "author",
+            "title",
+            "subTitle",
+            "textClass",
+            "pubPlace",
+            "pubDate",
+            "availability",
+            "layerInfos",
+            "docSigle",
+            "corpusSigle"
+        ],
+        "version": "0.59.3",
+        "benchmark": "10.240179 ms",
+        "totalResults": 14,
+        "serialQuery": "SpanMultiTermQueryWrapper(tokens:/tt/l:fein/)",
+        "itemsPerPage": 1
+    },
+    "query": {
+        "@type": "koral:token",
+        "wrap": {
+            "@type": "koral:term",
+            "key": "fein",
+            "foundry": "tt",
+            "layer": "l",
+            "type": "type:regex",
+            "match": "match:eq"
+        }
+    },
+    "collection": {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": "CC-BY.*",
+        "key": "availability",
+        "rewrites": [
+            {
+                "@type": "koral:rewrite",
+                "src": "Kustvakt",
+                "operation": "operation:insertion",
+                "scope": "availability(FREE)"
+            }
+        ]
+    },
+    "matches": [
+        {
+            "snippet": "<span class=\"context-left\">der Chemiker, welcher auf die Farben als Kriterien achtet, um die geheimern Eigenschaften körperlicher Wesen zu entdecken, hat bisher bei Benennung und Bezeichnung der Farben manches Hindernis gefunden; ja man ist nach einer näheren und <\/span><span class=\"match\"><mark>feineren<\/mark><\/span><span class=\"context-right\"> Betrachtung bewogen worden, die Farbe als ein unsicheres und trügliches Kennzeichen bei chemischen Operationen anzusehen.<\/span>",
+            "matchID": "match-GOE/AGF/00000-p4276-4277",
+            "UID": 0,
+            "textSigle": "GOE/AGF/00000",
+            "subTitle": "Didaktischer Teil",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGF",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Zur Farbenlehre",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        }
+    ]
+}

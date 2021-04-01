@@ -18,12 +18,6 @@ import de.ids_mannheim.korap.sru.QueryLanguage;
 /**
  * The tests are based on the sample corpus from the Goethe corpus.
  * 
- * The tests require a running KustvaktServer.
- * Specify the Kustvakt service URI at
- * /KorapSRU/src/main/webapp/WEB-INF/web.xml
- * 
- * and in the initialization of KorapClient in the code below.
- * 
  * @author margaretha
  *
  */
@@ -33,14 +27,16 @@ public class KorapClientTest {
     private KorapMatch match;
     
     public KorapClientTest () {
-        c = new KorapClient("http://localhost:8089/api/v1.0", 25, 50);
+        c = new KorapClient("http://localhost:1080/api/v1.0", 25, 50);
     }
 
     @Test
     public void testCQLQuery () throws HttpResponseException, IOException {
-        result = c.query("der", QueryLanguage.CQL, "1.2", 1, 25,
+        
+        
+        result = c.query("der", QueryLanguage.CQL, "1.2", 1, 1,
                 null);
-        assertEquals(25, result.getMatchSize());
+        assertEquals(1, result.getMatchSize());
         assertEquals(1858, result.getTotalResults());
     
         match = result.getMatch(0);

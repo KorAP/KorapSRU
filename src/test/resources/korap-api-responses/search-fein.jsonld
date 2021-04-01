@@ -1,0 +1,110 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {
+        "count": 25,
+        "startIndex": 0,
+        "timeout": 10000,
+        "context": "base/s:s",
+        "fields": [
+            "ID",
+            "UID",
+            "textSigle",
+            "corpusID",
+            "author",
+            "title",
+            "subTitle",
+            "textClass",
+            "pubPlace",
+            "pubDate",
+            "availability",
+            "layerInfos",
+            "docSigle",
+            "corpusSigle"
+        ],
+        "version": "0.59.3",
+        "benchmark": "0.157236466 s",
+        "totalResults": 3,
+        "serialQuery": "tokens:s:fein",
+        "itemsPerPage": 25
+    },
+    "query": {
+        "@type": "koral:token",
+        "wrap": {
+            "@type": "koral:term",
+            "key": "fein",
+            "layer": "orth",
+            "match": "match:eq",
+            "foundry": "opennlp",
+            "rewrites": [
+                {
+                    "@type": "koral:rewrite",
+                    "src": "Kustvakt",
+                    "operation": "operation:injection",
+                    "scope": "foundry"
+                }
+            ]
+        }
+    },
+    "collection": {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": "CC-BY.*",
+        "key": "availability",
+        "rewrites": [
+            {
+                "@type": "koral:rewrite",
+                "src": "Kustvakt",
+                "operation": "operation:insertion",
+                "scope": "availability(FREE)"
+            }
+        ]
+    },
+    "matches": [
+        {
+            "snippet": "<span class=\"context-left\">wir können also den untern Teil der Flamme für einen Dunst ansprechen, welcher, obgleich unendlich <\/span><span class=\"match\"><mark>fein<\/mark><\/span><span class=\"context-right\">, doch vor der dunklen Fläche sichtbar wird: er ist so fein, daß man bequem durch ihn lesen kann; dahingegen die Spitze der Flamme, welche uns die Gegenstände verdeckt, als ein selbstleuchtender Körper anzusehen ist.<\/span>",
+            "matchID": "match-GOE/AGF/00000-p15205-15206",
+            "UID": 0,
+            "textSigle": "GOE/AGF/00000",
+            "subTitle": "Didaktischer Teil",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGF",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Zur Farbenlehre",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        },
+        {
+            "snippet": "<span class=\"context-left\">wir können also den untern Teil der Flamme für einen Dunst ansprechen, welcher, obgleich unendlich fein, doch vor der dunklen Fläche sichtbar wird: er ist so <\/span><span class=\"match\"><mark>fein<\/mark><\/span><span class=\"context-right\">, daß man bequem durch ihn lesen kann; dahingegen die Spitze der Flamme, welche uns die Gegenstände verdeckt, als ein selbstleuchtender Körper anzusehen ist.<\/span>",
+            "matchID": "match-GOE/AGF/00000-p15216-15217",
+            "UID": 0,
+            "textSigle": "GOE/AGF/00000",
+            "subTitle": "Didaktischer Teil",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGF",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Zur Farbenlehre",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        },
+        {
+            "snippet": "<span class=\"context-left\">übrigens haben einige Pflanzen die Eigenschaft, durch künstliche Behandlung fast durchaus in ein Farbenmaterial verwandelt zu werden, das so <\/span><span class=\"match\"><mark>fein<\/mark><\/span><span class=\"context-right\">, wirksam und unendlich teilbar ist als irgendein anderes.<\/span>",
+            "matchID": "match-GOE/AGF/00000-p45002-45003",
+            "UID": 0,
+            "textSigle": "GOE/AGF/00000",
+            "subTitle": "Didaktischer Teil",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGF",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Zur Farbenlehre",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        }
+    ]
+}

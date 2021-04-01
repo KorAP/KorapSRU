@@ -1,52 +1,74 @@
 package de.ids_mannheim.korap.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockserver.model.HttpOverrideForwardedRequest.forwardOverriddenRequest;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.http.HttpResponse;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
+import org.mockserver.model.Header;
+import org.xml.sax.SAXException;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.util.RedirectStrategy;
 
 /**
- * The test requires a running KustvaktServer.
- * Specify the Kustvakt service URI at
- * /KorapSRU/src/main/webapp/WEB-INF/web.xml
  * 
  * @author margaretha
  *
  */
-public class RedirectTest {
+public class RedirectTest extends BaseTest {
 
-//    private String korapAPI = "http://localhost:8089/api/";
-    private String korapAPI = "http://10.0.10.51:9000/api/";
-    
     @Test
-    public void testRedirect () throws ClientProtocolException, IOException {
-        HttpClient client = HttpClientBuilder.create()
-                .setRedirectStrategy(new RedirectStrategy()).build();
-        HttpResponse response = client.execute(new HttpGet(
-                korapAPI+"search?q=Wasser&ql=poliqarp"));
-        assertEquals(200, response.getStatusLine().getStatusCode());
-        
-        InputStream is = response.getEntity().getContent();
-        
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = null;
-        String content = "";
-        while ((line = br.readLine())!=null){
-            content += line;
-        }
-        
-        assertTrue(!content.isEmpty());
+    public void testRedirect () throws ClientProtocolException, IOException,
+            SAXException, ParserConfigurationException {
+
+        String searchResult = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "korap-api-responses/search-lemma-fein.jsonld"),
+                StandardCharsets.UTF_8);
+
+        mockClient.reset()
+                .when(request().withMethod("GET").withPath("/search")
+                        .withQueryStringParameter("q", "[tt:lemma=\"fein\"]")
+                        .withQueryStringParameter("ql", "fcsql")
+                        .withQueryStringParameter("v", "2.0")
+                        .withQueryStringParameter("context", "sentence")
+                        .withQueryStringParameter("count", "1")
+                        .withQueryStringParameter("offset", "0"))
+                .forward(forwardOverriddenRequest(
+                        request().withPath("/redirect")));
+
+        mockClient
+                .when(request().withMethod("GET").withPath("/redirect")
+                        .withQueryStringParameter("q", "[tt:lemma=\"fein\"]")
+                        .withQueryStringParameter("ql", "fcsql")
+                        .withQueryStringParameter("v", "2.0")
+                        .withQueryStringParameter("context", "sentence")
+                        .withQueryStringParameter("count", "1")
+                        .withQueryStringParameter("offset", "0"))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(searchResult).withStatusCode(200));
+
+        ClientResponse response = resource()
+                .queryParam("operation", "searchRetrieve")
+                .queryParam("query", "[tt:lemma=\"fein\"]")
+                .queryParam("queryType", "fcs")
+                .queryParam("maximumRecords", "1").get(ClientResponse.class);
+
+        InputStream entity = response.getEntity(InputStream.class);
+        checkSRUSearchRetrieveResponse(entity);
     }
 }
