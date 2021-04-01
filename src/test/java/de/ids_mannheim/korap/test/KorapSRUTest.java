@@ -44,7 +44,7 @@ public class KorapSRUTest extends BaseTest {
                 .when(request().withMethod("GET").withPath("/search")
                         .withQueryStringParameter("q", "fein")
                         .withQueryStringParameter("ql", "cql")
-                        .withQueryStringParameter("v", "2.0")
+                        .withQueryStringParameter("v", "1.2")
                         .withQueryStringParameter("context", "sentence")
                         .withQueryStringParameter("count", "25")
                         .withQueryStringParameter("offset", "0"))
@@ -113,10 +113,11 @@ public class KorapSRUTest extends BaseTest {
 
         ClientResponse response =
                 resource().queryParam("operation", "searchRetrieve")
+                        .queryParam("version", "1.2")
                         .queryParam("query", "fein").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSRUSearchRetrieveResponse(entity);
+        checkSearchRetrieveResponseSRUVersion1_2(entity);
     }
 
     @Test
@@ -128,20 +129,21 @@ public class KorapSRUTest extends BaseTest {
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
-                .queryParam("query", "fein").queryParam("x-fcs-context", "GOE")
-                .get(ClientResponse.class);
+                .queryParam("query", "fein").queryParam("version", "1.2")
+                .queryParam("x-fcs-context", "GOE").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSRUSearchRetrieveResponse(entity);
+        checkSearchRetrieveResponseSRUVersion1_2(entity);
     }
 
     @Test
     public void searchRetrieveFCSQLTest ()
             throws IOException, SAXException, ParserConfigurationException {
 
-        createExpectationForSearch("[tt:lemma=\"fein\"]",
+        createExpectationForSearch("[tt:lemma=\"fein\"]", "fcsql", "2.0", "0",
                 "search-lemma-fein.jsonld");
-        createExpectationForMatchInfoLemmaFein();
+        createExpectationForMatchInfo("GOE-AGF-00000-p4276-4277.jsonld",
+                "/corpus/GOE/AGF/00000/p4276-4277/matchInfo");
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
@@ -150,7 +152,7 @@ public class KorapSRUTest extends BaseTest {
                 .queryParam("maximumRecords", "1").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSRUSearchRetrieveResponse(entity);
+        checkSearchRetrieveResponseSRUVersion2(entity);
     }
 
     @Test
@@ -166,7 +168,7 @@ public class KorapSRUTest extends BaseTest {
                 .when(request().withMethod("GET").withPath("/search")
                         .withQueryStringParameter("q", "der")
                         .withQueryStringParameter("ql", "cql")
-                        .withQueryStringParameter("v", "2.0")
+                        .withQueryStringParameter("v", "1.2")
                         .withQueryStringParameter("context", "sentence")
                         .withQueryStringParameter("count", "1")
                         .withQueryStringParameter("offset", "50"))
@@ -193,12 +195,13 @@ public class KorapSRUTest extends BaseTest {
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
                 .queryParam("query", "der").queryParam("startRecord", "51")
-                .queryParam("maximumRecords", "1").get(ClientResponse.class);
+                .queryParam("version", "1.2").queryParam("maximumRecords", "1")
+                .get(ClientResponse.class);
         InputStream entity = response.getEntity(InputStream.class);
         Document doc = docBuilder.parse(entity);
 
         NodeList nodelist =
-                doc.getElementsByTagName("sruResponse:recordPosition");
+                doc.getElementsByTagName("sru:recordPosition");
         assertEquals("51", nodelist.item(0).getTextContent());
     }
 
@@ -276,17 +279,7 @@ public class KorapSRUTest extends BaseTest {
             throws URISyntaxException, ClientProtocolException, IOException,
             IllegalStateException, SAXException {
 
-        String korapResources = IOUtils.toString(
-                ClassLoader.getSystemResourceAsStream(
-                        "korap-api-responses/resources.json"),
-                StandardCharsets.UTF_8);
-
-        mockClient.reset()
-                .when(request().withMethod("GET").withPath("/resource"))
-                .respond(response()
-                        .withHeader(new Header("Content-Type",
-                                "application/json; charset=utf-8"))
-                        .withBody(korapResources).withStatusCode(200));
+        createRetrieveResource();
 
         ClientResponse response = resource().queryParam("operation", "explain")
                 .queryParam("x-fcs-endpoint-description", "true")

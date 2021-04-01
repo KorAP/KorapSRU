@@ -12,15 +12,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
 import org.mockserver.model.Header;
 import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.ClientResponse;
-
-import de.ids_mannheim.korap.util.RedirectStrategy;
 
 /**
  * 
@@ -62,6 +58,9 @@ public class RedirectTest extends BaseTest {
                                 "application/json; charset=utf-8"))
                         .withBody(searchResult).withStatusCode(200));
 
+        createExpectationForMatchInfo("GOE-AGF-00000-p4276-4277.jsonld",
+                "/corpus/GOE/AGF/00000/p4276-4277/matchInfo");
+
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
                 .queryParam("query", "[tt:lemma=\"fein\"]")
@@ -69,6 +68,6 @@ public class RedirectTest extends BaseTest {
                 .queryParam("maximumRecords", "1").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSRUSearchRetrieveResponse(entity);
+        checkSearchRetrieveResponseSRUVersion2(entity);
     }
 }

@@ -1,0 +1,90 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {
+        "count": 1,
+        "startIndex": 0,
+        "timeout": 10000,
+        "context": "base/s:s",
+        "fields": [
+            "ID",
+            "UID",
+            "textSigle",
+            "corpusID",
+            "author",
+            "title",
+            "subTitle",
+            "textClass",
+            "pubPlace",
+            "pubDate",
+            "availability",
+            "layerInfos",
+            "docSigle",
+            "corpusSigle"
+        ],
+        "version": "0.59.3",
+        "benchmark": "23.809748 ms",
+        "totalResults": 55,
+        "serialQuery": "spanOr([SpanMultiTermQueryWrapper(tokens:/s:blaue/), SpanMultiTermQueryWrapper(tokens:/s:grüne/)])",
+        "itemsPerPage": 1
+    },
+    "query": {
+        "@type": "koral:group",
+        "operation": "operation:disjunction",
+        "operands": [
+            {
+                "@type": "koral:token",
+                "wrap": {
+                    "@type": "koral:term",
+                    "key": "blaue",
+                    "foundry": "opennlp",
+                    "layer": "orth",
+                    "type": "type:regex",
+                    "match": "match:eq"
+                }
+            },
+            {
+                "@type": "koral:token",
+                "wrap": {
+                    "@type": "koral:term",
+                    "key": "grüne",
+                    "foundry": "opennlp",
+                    "layer": "orth",
+                    "type": "type:regex",
+                    "match": "match:eq"
+                }
+            }
+        ]
+    },
+    "collection": {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": "CC-BY.*",
+        "key": "availability",
+        "rewrites": [
+            {
+                "@type": "koral:rewrite",
+                "src": "Kustvakt",
+                "operation": "operation:insertion",
+                "scope": "availability(FREE)"
+            }
+        ]
+    },
+    "matches": [
+        {
+            "snippet": "<span class=\"context-left\">die Purpurfarbe, welche die vom Schnee Geblendeten erblicken, gehört hieher so wie die ungemein schöne <\/span><span class=\"match\"><mark>grüne<\/mark><\/span><span class=\"context-right\"> Farbe dunkler Gegenstände, nachdem man auf ein weißes Papier in der Sonne lange hingesehen.<\/span>",
+            "matchID": "match-GOE/AGF/00000-p7744-7745",
+            "UID": 0,
+            "textSigle": "GOE/AGF/00000",
+            "subTitle": "Didaktischer Teil",
+            "author": "Goethe, Johann Wolfgang von",
+            "docSigle": "GOE/AGF",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "München",
+            "availability": "CC-BY-SA",
+            "title": "Zur Farbenlehre",
+            "pubDate": "1982",
+            "corpusSigle": "GOE"
+        }
+    ]
+}

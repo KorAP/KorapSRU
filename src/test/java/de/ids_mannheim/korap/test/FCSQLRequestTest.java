@@ -39,9 +39,10 @@ public class FCSQLRequestTest extends BaseTest {
     public void testLemmaRegex () throws URISyntaxException, IOException,
             SAXException, ParserConfigurationException {
 
-        createExpectationForSearch("[tt:lemma=\".*bar\"]",
+        createExpectationForSearch("[tt:lemma=\".*bar\"]", "fcsql", "2.0", "0",
                 "search-lemma-bar.jsonld");
-        createExpectationForMatchInfoLemmaBar();
+        createExpectationForMatchInfo("GOE-AGA-01784-p614-615.jsonld",
+                "/corpus/GOE/AGA/01784/p614-615/matchInfo");
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
@@ -50,7 +51,7 @@ public class FCSQLRequestTest extends BaseTest {
                 .queryParam("maximumRecords", "1").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        Document doc = checkSRUSearchRetrieveResponse(entity);
+        Document doc = checkSearchRetrieveResponseSRUVersion2(entity);
 
         NodeList nodeList =
                 doc.getElementsByTagName("sruResponse:numberOfRecords");
@@ -63,7 +64,8 @@ public class FCSQLRequestTest extends BaseTest {
     public void testUnsupportedLayer () throws URISyntaxException, IOException,
             SAXException, ParserConfigurationException {
 
-        createExpectationForSearch("[unknown=\"fein\"]", "unknownLayer.jsonld");
+        createExpectationForSearch("[unknown=\"fein\"]", "fcsql", "2.0", "0",
+                "unknownLayer.jsonld");
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
@@ -83,8 +85,8 @@ public class FCSQLRequestTest extends BaseTest {
     @Test
     public void testUnsupportedQualifer () throws URISyntaxException,
             IOException, SAXException, ParserConfigurationException {
-        createExpectationForSearch("[unknown:lemma=\"fein\"]",
-                "unknownQualifier.jsonld");
+        createExpectationForSearch("[unknown:lemma=\"fein\"]", "fcsql", "2.0",
+                "0", "unknownQualifier.jsonld");
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")

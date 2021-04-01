@@ -1,0 +1,6 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {"version": "Krill-0.59.3"},
+    "matchID": "match-WPD15/D18/06488-p588-589",
+    "textSigle": "WPD15/D18/06488"
+}
