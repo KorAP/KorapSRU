@@ -214,4 +214,19 @@ public class KorapEndpointDescription implements EndpointDescription {
     public void setTextLayer (Layer textLayer) {
         this.textLayer = textLayer;
     }
+
+    @Override
+    public int getVersion () {
+        return VERSION_2;
+    }
+
+    @Override
+    public boolean isVersion (int version) {
+        if(version == VERSION_2) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
