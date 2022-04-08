@@ -1,3 +1,15 @@
+1.0.6-SNAPSHOT
+
+
+1.0.5-SNAPSHOT
+  
+2022-03-26
+  - Override maven-default-http-blocker with a dummy (kupietz)
+2021-12-10  
+  - Updated log4j due to CVE-2021-44228
+2021-05-21  
+  - Disable re-running CI tests on unmerged pull-requests (kupietz)
+
 20/11/2020
   - Fixed parsing error response from KorAP API and updated tests
   - Removed RecordIdentifier and updated version.
