@@ -1,5 +1,8 @@
 1.0.6-SNAPSHOT
 
+2022-10-05
+  - Dependency Updates due to CVE-2022-42003 (diewald)
+
 
 1.0.5-SNAPSHOT
   
