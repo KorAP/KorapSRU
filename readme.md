@@ -60,7 +60,7 @@ Configure the service URI in ```/src/main/webapp/WEB-INF/web.xml``` to a Kustvak
 ```
 <context-param>
   <param-name>korap.service.uri</param-name>
-  <param-value>http://localhost:8089/api/</param-value>
+  <param-value>https://korap.ids-mannheim.de/api/v1.0/</param-value>
 </context-param>
 ```
 
@@ -74,3 +74,7 @@ $ mvn install -Dhttps.protocols=TLS1.2
 
 in  a terminal.
 
+## License
+
+KorapSRU is published under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE). It is developed as part of [CLARIN](https://www.clarin.eu/) and [KorAP](https://korap.ids-mannheim.de/), the Corpus Analysis Platform at the [Leibniz Institute for the German Language (IDS)](https://www.ids-mannheim.de/),
+member of the [Leibniz Association](https://www.leibniz-gemeinschaft.de).
