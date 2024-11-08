@@ -7,7 +7,7 @@ KorapSRU is the [CLARIN Federated Content Search (FCS)](https://www.clarin.eu/co
 CLARIN defines FCS specifications to allow distributed search across multiple heterogenous search engines in a uniform way. FCS specifications are built on the [SRU/CQL protocol](http://www.loc.gov/standards/sru/) for communications between its client and endpoint. FCS 1.0 specification supports SRU (Search Retrieve via URL) 1.2 and FCS 2.0 specification supports SRU 2.0. 
 
 
-[KorapSRU 1.0.1 release](https://github.com/KorAP/KorapSRU/releases/tag/release-1.0.1) implements FCS 1.0 specification and supports basic search using simple CQL (Contextual Query Language) for term query, phrase query and boolean query. FCS 2.0 specification is implemented in the newest version of KorapSRU, but it has not been released yet. It supports extended search (e.g. annotation search) that can be formulated using FCS Query Language (FCSQL) developed based on Corpus Query Processor ([CQP](http://cwb.sourceforge.net/files/CQP_Tutorial/)). FCSQL is only available with SRU version 2.0, whilst CQL is available with SRU version 1.1, 1.2 and 2.0.
+[KorapSRU 1.0.1 release](https://github.com/KorAP/KorapSRU/releases/tag/release-1.0.1) implements FCS 1.0 specification and supports basic search using simple CQL (Contextual Query Language) for term query, phrase query and boolean query. FCS 2.0 specification has been implemented in the newer versions. It supports extended search (e.g. annotation search) that can be formulated using FCS Query Language (FCSQL) developed based on Corpus Query Processor ([CQP](http://cwb.sourceforge.net/files/CQP_Tutorial/)). FCSQL is only available with SRU version 2.0, whilst CQL is available with SRU version 1.1, 1.2 and 2.0.
 
 Usually CQL and FCSQL queries are translated into the native language of a search engine in an FCS endpoint. Since KorAP supports multiple query languages and has its own query translator [Koral](https://github.com/KorAP/Koral), the translation is implemented in Koral, not in KorapSRU. Therefore, KorAP users will also be able to use CQL and FCSQL.
 
@@ -47,7 +47,7 @@ in FCS query: ```[tt:lemma=".*heit"]```
   
 ## Software Requirements
   
-* Java 7 (JDK 1.7 with JCE or OpenJDK 7)
+* Java 8 (JDK 1.8 or OpenJDK 8)
  
 * Tomcat 7
 
@@ -55,7 +55,7 @@ in FCS query: ```[tt:lemma=".*heit"]```
 
 ## Installation
 
-Configure the service URI in ```/src/main/webapp/WEB-INF/web.xml``` to a Kustvakt server URI, for example:
+Configure the service URI in ```/src/main/webapp/WEB-INF/web.xml``` to KorAP API provider:
 
 ```
 <context-param>
@@ -64,7 +64,6 @@ Configure the service URI in ```/src/main/webapp/WEB-INF/web.xml``` to a Kustvak
 </context-param>
 ```
 
-KorapSRU is built based on the FCSSimpleEndpoint library provided by CLARIN. KorapSRU 1.0.2-SNAPSHOT uses FCSSimpleEndpoint version 1.3.0 available from CLARIN Nexus repository. To allow Maven to download the library using JDK 1.7, an additional Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 7 is needed.
 
 To install a war file of KorapSRU, go to the root directory of the project and run
 
