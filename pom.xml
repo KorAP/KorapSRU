@@ -4,7 +4,7 @@
 
 	<groupId>de.mannheim.ids</groupId>
 	<artifactId>KorapSRU</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<packaging>war</packaging>
 
 	<name>KorapSRU</name>
