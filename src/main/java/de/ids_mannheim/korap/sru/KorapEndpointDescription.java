@@ -21,6 +21,7 @@ import eu.clarin.sru.server.fcs.DataView.DeliveryPolicy;
 import eu.clarin.sru.server.fcs.EndpointDescription;
 import eu.clarin.sru.server.fcs.Layer;
 import eu.clarin.sru.server.fcs.ResourceInfo;
+import eu.clarin.sru.server.fcs.ResourceInfo.AvailabilityRestriction;
 import eu.clarin.sru.server.fcs.utils.SimpleEndpointDescriptionParser;
 
 /**
@@ -132,11 +133,12 @@ public class KorapEndpointDescription implements EndpointDescription {
             description = new HashMap<String, String>();
             description.put("de", r.getDescription());
 
-            ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
-                    description, null,KorapSRU.korapWebUri,
-                    Arrays.asList(r.getLanguages()), dataviews,
-                    this.getSupportedLayers(), null);
-            resourceList.add(ri);
+			ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
+					description, null, KorapSRU.korapWebUri,
+					Arrays.asList(r.getLanguages()),
+					AvailabilityRestriction.NONE, dataviews,
+					this.getSupportedLayers(), null);
+			resourceList.add(ri);
         }
 
         return resourceList;
@@ -229,4 +231,10 @@ public class KorapEndpointDescription implements EndpointDescription {
             return false;
         }
     }
+
+	@Override
+	public ResourceInfo getResource (String pid) throws SRUException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
