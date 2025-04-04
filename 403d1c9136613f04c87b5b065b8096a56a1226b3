@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82ff0a04_a96fe682",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2025-04-04T09:30:15Z",
+      "side": 1,
+      "message": "I wasn\u0027t able to mount a folder without root, so I mount files. Maybe there is a better configuration option in the future.",
+      "revId": "403d1c9136613f04c87b5b065b8096a56a1226b3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
