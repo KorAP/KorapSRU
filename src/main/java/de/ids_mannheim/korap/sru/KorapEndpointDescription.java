@@ -134,7 +134,7 @@ public class KorapEndpointDescription implements EndpointDescription {
             description.put("de", r.getDescription());
 
 			ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
-					description, null, KorapSRU.korapWebUri,
+					description, null, r.getLandingPage(),
 					Arrays.asList(r.getLanguages()),
 					AvailabilityRestriction.NONE, dataviews,
 					this.getSupportedLayers(), null);

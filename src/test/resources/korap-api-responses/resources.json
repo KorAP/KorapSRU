@@ -14,7 +14,9 @@
             "11": "corenlp/p",
             "27": "tt/l",
             "28": "tt/p"
-        }
+        },
+         "institution" : "Wikimedia Foundation",
+         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WPD17"
     },
     {
         "resourceId": "WDD17",
@@ -31,7 +33,9 @@
             "11": "corenlp/p",
             "27": "tt/l",
             "28": "tt/p"
-        }
+        },
+        "institution" : "Wikimedia Foundation",
+         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WDD17"
     },
     {
         "resourceId": "WUD17",
@@ -48,6 +52,8 @@
             "11": "corenlp/p",
             "27": "tt/l",
             "28": "tt/p"
-        }
+        },
+        "institution" : "Wikimedia Foundation",
+         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WUD17"
     }
 ]

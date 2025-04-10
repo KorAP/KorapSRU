@@ -1,3 +1,10 @@
+1.0.7-SNAPSHOT
+
+- update libraries including fcs-simple-endpoint 1.8.0
+- add Dockerfile
+- add institution
+- improve landingPageURI with corpus query
+
 1.0.6-SNAPSHOT
 
 2022-10-05

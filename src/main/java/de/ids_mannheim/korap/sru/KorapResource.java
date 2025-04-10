@@ -2,6 +2,9 @@ package de.ids_mannheim.korap.sru;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class KorapResource {
 
     private String resourceId;
@@ -9,6 +12,9 @@ public class KorapResource {
     private String description;
     private String[] languages;
     private Map<Integer, String> layers;
+    private String institution;
+    private String landingPage;
+    
     public String getResourceId () {
         return resourceId;
     }
@@ -39,5 +45,17 @@ public class KorapResource {
     public void setLayers (Map<Integer, String> layers) {
         this.layers = layers;
     }
+	public String getInstitution () {
+		return institution;
+	}
+	public void setInstitution (String institution) {
+		this.institution = institution;
+	}
+	public String getLandingPage () {
+		return landingPage;
+	}
+	public void setLandingPage (String landingPage) {
+		this.landingPage = landingPage;
+	}
 
 }
