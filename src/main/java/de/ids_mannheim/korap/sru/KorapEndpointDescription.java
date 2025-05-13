@@ -131,7 +131,7 @@ public class KorapEndpointDescription implements EndpointDescription {
 
         for (KorapResource r : resources) {
             description = new HashMap<String, String>();
-            description.put("de", r.getDescription());
+            description.put("en", r.getDescription());
 
 			ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
 					description, null, r.getLandingPage(),
