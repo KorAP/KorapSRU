@@ -40,7 +40,7 @@ public class KorapSRUTest extends BaseTest {
                         "korap-api-responses/search-fein.jsonld"),
                 StandardCharsets.UTF_8);
 
-        mockClient.reset()
+        mockClient
                 .when(request().withMethod("GET").withPath("/search")
                         .withQueryStringParameter("q", "fein")
                         .withQueryStringParameter("ql", "cql")
@@ -48,6 +48,27 @@ public class KorapSRUTest extends BaseTest {
                         .withQueryStringParameter("context", "sentence")
                         .withQueryStringParameter("count", "25")
                         .withQueryStringParameter("offset", "0"))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(searchResult).withStatusCode(200));
+    }
+    
+    private void createExpectationForSearchFeinWithUnknownCq () throws IOException {
+        String searchResult = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "korap-api-responses/search-fein-unknown-cq.jsonld"),
+                StandardCharsets.UTF_8);
+
+        mockClient
+                .when(request().withMethod("GET").withPath("/search")
+                        .withQueryStringParameter("q", "fein")
+                        .withQueryStringParameter("ql", "cql")
+                        .withQueryStringParameter("v", "1.2")
+                        .withQueryStringParameter("context", "sentence")
+                        .withQueryStringParameter("count", "25")
+                        .withQueryStringParameter("offset", "0")
+                        .withQueryStringParameter("cq","corpusSigle=unknown"))
                 .respond(response()
                         .withHeader(new Header("Content-Type",
                                 "application/json; charset=utf-8"))
@@ -124,17 +145,45 @@ public class KorapSRUTest extends BaseTest {
     public void searchRetrieveWithResourceId ()
             throws IOException, URISyntaxException, IllegalStateException,
             SAXException, ParserConfigurationException {
-        createExpectationForSearchFein();
+    	createExpectationForRetrieveResource();
+    	createExpectationForSearchFein();
         createExpectationForMatchInfoFein();
 
         ClientResponse response = resource()
                 .queryParam("operation", "searchRetrieve")
                 .queryParam("query", "fein").queryParam("version", "1.2")
-                .queryParam("x-fcs-context", "GOE").get(ClientResponse.class);
+                .queryParam("x-fcs-context", "http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
         checkSearchRetrieveResponseSRUVersion1_2(entity);
     }
+    
+    @Test
+    public void searchRetrieveWithUnknownResourceId ()
+            throws IOException, URISyntaxException, IllegalStateException,
+            SAXException, ParserConfigurationException {
+    	
+    	createExpectationForRetrieveResource();
+    	createExpectationForSearchFeinWithUnknownCq();
+        createExpectationForMatchInfoFein();
+
+        ClientResponse response = resource()
+                .queryParam("operation", "searchRetrieve")
+                .queryParam("query", "fein").queryParam("version", "1.2")
+                .queryParam("x-fcs-context", "unknown").get(ClientResponse.class);
+
+		InputStream entity = response.getEntity(InputStream.class);
+		docBuilder = factory.newDocumentBuilder();
+		Document doc = docBuilder.parse(entity);
+
+		NodeList diagnosticUri = doc.getElementsByTagName("diag:uri");
+		assertEquals("info:srw/diagnostic/1/1",
+				diagnosticUri.item(0).getTextContent());
+
+		NodeList diagnosticMessage = doc.getElementsByTagName("diag:message");
+		assertEquals("Virtual corpus with pid: unknown is not found.",
+				diagnosticMessage.item(0).getTextContent());
+	}
 
     @Test
     public void searchRetrieveFCSQLTest ()
@@ -279,7 +328,7 @@ public class KorapSRUTest extends BaseTest {
             throws URISyntaxException, ClientProtocolException, IOException,
             IllegalStateException, SAXException {
 
-        createRetrieveResource();
+        createExpectationForRetrieveResource();
 
         ClientResponse response = resource().queryParam("operation", "explain")
                 .queryParam("x-fcs-endpoint-description", "true")

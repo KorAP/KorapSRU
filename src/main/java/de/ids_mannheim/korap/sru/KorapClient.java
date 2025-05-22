@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -30,6 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.ids_mannheim.korap.util.RedirectStrategy;
+import eu.clarin.sru.server.SRUConstants;
+import eu.clarin.sru.server.SRUException;
 
 /**
  * Client to KorAP public services supporting calls to the resource,
@@ -50,6 +54,9 @@ public class KorapClient {
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static Logger logger =
             (Logger) LoggerFactory.getLogger(KorapClient.class);
+    
+    // pid : cq
+    public static Map<String, String> virtualCorpora = new HashMap<>();
 
     /**
      * Constructs a KorapClient with the given number of records per
@@ -105,6 +112,16 @@ public class KorapClient {
             InputStream jsonStream = response.getEntity().getContent();
             try {
                 resources = objectMapper.readValue(jsonStream, KorapResource[].class);
+                
+                // update vc map
+                if (resources.length > virtualCorpora.size()) {
+                	for (KorapResource r : resources) {
+                		String[] urlParts = r.getLandingPage().split("cq=");
+                		if (urlParts.length > 1 && !urlParts[1].isEmpty()) {
+                			virtualCorpora.put(r.getResourceId(), urlParts[1]);
+                		}
+                	}
+                }
             }
             catch (JsonParseException | JsonMappingException e) {
                 throw e;
@@ -140,10 +157,11 @@ public class KorapClient {
      * 
      * @throws HttpResponseException
      * @throws IOException
+     * @throws SRUException 
      */
     public KorapResult query (String query, QueryLanguage queryLanguage,
             String version, int startRecord, int maximumRecords,
-            String[] corpora) throws HttpResponseException, IOException {
+            String[] corpora) throws IOException, SRUException {
 
         if (query == null) {
             throw new NullPointerException("Query is null.");
@@ -274,10 +292,13 @@ public class KorapClient {
      * @param corpora 
      * @return a HttpGet request
      * @throws URISyntaxException
+     * @throws IOException 
+     * @throws SRUException 
      */
-    private HttpGet createSearchRequest (String query,
-            QueryLanguage queryLanguage, String version, int startRecord,
-            int maximumRecords, String[] corpora) throws URISyntaxException {
+	private HttpGet createSearchRequest (String query,
+			QueryLanguage queryLanguage, String version, int startRecord,
+			int maximumRecords, String[] corpora)
+			throws URISyntaxException, IOException, SRUException {
 
         if (maximumRecords <= 0) {
             maximumRecords = defaultNumOfRecords;
@@ -288,36 +309,79 @@ public class KorapClient {
             maximumRecords = defaultMaxRecords;
         }
         
-        String corpusQuery = "";
-        if (corpora != null && corpora.length > 0) {
-            for (int i = 0; i < corpora.length; i++) {
-                corpusQuery += "corpusSigle=" + corpora[i];
-                if (i != corpora.length - 1) {
-                    corpusQuery += "|";
-                }
-            }
-        }
+        String corpusQuery = resolveVirtualCorpus(corpora);
+//        if (corpora != null && corpora.length > 0) {
+//            for (int i = 0; i < corpora.length; i++) {
+//                corpusQuery += "corpusSigle=" + corpora[i];
+//                if (i != corpora.length - 1) {
+//                    corpusQuery += "|";
+//                }
+//            }
+//        }
 
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("q", query));
-        params.add(new BasicNameValuePair("ql", queryLanguage.toString()));
-        if (!corpusQuery.isEmpty()){
-            params.add(new BasicNameValuePair("cq", corpusQuery));
-        }
-        params.add(new BasicNameValuePair("v", version));
-        params.add(new BasicNameValuePair("context", DEFAULT_CONTEXT_TYPE));
-        params.add(new BasicNameValuePair("count",
-                String.valueOf(maximumRecords)));
-        params.add(
-                new BasicNameValuePair("offset", String.valueOf(startRecord)));
-
-        URIBuilder builder = new URIBuilder(serviceUri + "/search");
-        builder.addParameters(params);
-
-        URI uri = builder.build();
+        URI uri = createSearchUri(query, queryLanguage, version, startRecord,
+		maximumRecords, corpusQuery, false);
+        
         logger.info("Query URI: " + uri.toString());
         HttpGet request = new HttpGet(uri);
         return request;
+    }
+    
+	private String resolveVirtualCorpus (String[] corpora)
+			throws URISyntaxException, IOException, SRUException {
+		String corpusQuery = "";
+    	if (corpora != null && corpora.length > 0) {
+            for (int i = 0; i < corpora.length; i++) {
+            	String pid = corpora[i]; 
+            	String cq = virtualCorpora.get(pid);
+            	if (cq != null) {
+            		corpusQuery += " & " + cq;
+            	}
+            	else {
+            		retrieveResources();
+            		cq = virtualCorpora.get(pid);
+            		if (cq != null) {
+                		corpusQuery += " & " + cq;
+            		}
+					else {
+						throw new SRUException(
+								SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
+								"Virtual corpus with pid: " + pid
+										+ " is not found.");
+					}
+        		}            	
+            }
+        }
+    	return corpusQuery;
+	}
+    
+	private URI createSearchUri (String query, QueryLanguage queryLanguage,
+			String version, int startRecord, int maximumRecords,
+			String corpusQuery, boolean authenticationRequired)
+			throws URISyntaxException {
+
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("q", query));
+		params.add(new BasicNameValuePair("ql", queryLanguage.toString()));
+		if (!corpusQuery.isEmpty()) {
+			params.add(new BasicNameValuePair("cq", corpusQuery));
+		}
+		params.add(new BasicNameValuePair("v", version));
+		params.add(new BasicNameValuePair("context", DEFAULT_CONTEXT_TYPE));
+		params.add(new BasicNameValuePair("count",
+				String.valueOf(maximumRecords)));
+		params.add(
+				new BasicNameValuePair("offset", String.valueOf(startRecord)));
+
+		if (authenticationRequired) {
+			params.add(
+					new BasicNameValuePair("access-rewrite-disabled", "true"));
+		}
+
+        URIBuilder builder = new URIBuilder(serviceUri + "/search");
+        builder.addParameters(params);
+        URI uri = builder.build();
+        return uri;
     }
 
     /**

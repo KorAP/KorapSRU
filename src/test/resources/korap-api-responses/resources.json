@@ -1,59 +1,65 @@
 [
-    {
-        "resourceId": "WPD17",
-        "titles": {
-            "de": "Deutsche Wikipedia Artikel 2017",
-            "en": "German Wikipedia Articles 2017"
-        },
-        "description": "A collection of articles of German Wikipedia from July 1st, 2017.",
-        "languages": ["deu"],
-        "layers": {
-            "18": "marmot/m",
-            "19": "marmot/p",
-            "23": "opennlp/p",
-            "11": "corenlp/p",
-            "27": "tt/l",
-            "28": "tt/p"
-        },
-         "institution" : "Wikimedia Foundation",
-         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WPD17"
+  {
+    "resourceId": "http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
+    "titles": {
+      "de": "Deutsche Wikipedia Artikel 2017",
+      "en": "German Wikipedia Articles 2017"
     },
-    {
-        "resourceId": "WDD17",
-        "titles": {
-            "de": "Deutsche Wikipedia-Diskussionskorpus 2017",
-            "en": "German Wikipedia talk corpus 2017"
-        },
-        "description": "A collection of talk pages of German Wikipedia from July 1st, 2017.",
-        "languages": ["deu"],
-        "layers": {
-            "18": "marmot/m",
-            "19": "marmot/p",
-            "23": "opennlp/p",
-            "11": "corenlp/p",
-            "27": "tt/l",
-            "28": "tt/p"
-        },
-        "institution" : "Wikimedia Foundation",
-         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WDD17"
+    "description": "A collection of articles of German Wikipedia from July 1st, 2017.",
+    "languages": [
+      "deu"
+    ],
+    "layers": {
+      "1": "opennlp/p",
+      "14": "marmot/m",
+      "15": "marmot/p",
+      "29": "corenlp/p",
+      "30": "tt/l",
+      "31": "tt/p"
     },
-    {
-        "resourceId": "WUD17",
-        "titles": {
-            "de": "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
-            "en": "German Wikipedia talk corpus 2017"
-        },
-        "description": "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
-        "languages": ["deu"],
-        "layers": {
-            "18": "marmot/m",
-            "19": "marmot/p",
-            "23": "opennlp/p",
-            "11": "corenlp/p",
-            "27": "tt/l",
-            "28": "tt/p"
-        },
-        "institution" : "Wikimedia Foundation",
-         "landingPage" : "https://korap.ids-mannheim.de?corpusSigle=WUD17"
-    }
+    "institution": "IDS Mannheim",
+    "landingPage": "https://korap.ids-mannheim.de?cq=corpusSigle=WPD17"
+  },
+  {
+    "resourceId": "http://hdl.handle.net/10932/00-03B6-558F-5EA0-6301-B",
+    "titles": {
+      "de": "Deutsche Wikipedia-Diskussionskorpus 2017",
+      "en": "German Wikipedia talk corpus 2017"
+    },
+    "description": "A collection of talk pages of German Wikipedia from July 1st, 2017.",
+    "languages": [
+      "deu"
+    ],
+    "layers": {
+      "1": "opennlp/p",
+      "14": "marmot/m",
+      "15": "marmot/p",
+      "29": "corenlp/p",
+      "30": "tt/l",
+      "31": "tt/p"
+    },
+    "institution": "IDS Mannheim",
+    "landingPage": "https://korap.ids-mannheim.de?cq=corpusSigle=WDD17"
+  },
+  {
+    "resourceId": "http://hdl.handle.net/10932/00-03B6-558F-6EF0-6401-F",
+    "titles": {
+      "de": "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
+      "en": "German Wikipedia user talk corpus 2017"
+    },
+    "description": "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
+    "languages": [
+      "deu"
+    ],
+    "layers": {
+      "1": "opennlp/p",
+      "14": "marmot/m",
+      "15": "marmot/p",
+      "29": "corenlp/p",
+      "30": "tt/l",
+      "31": "tt/p"
+    },
+    "institution": "IDS Mannheim",
+    "landingPage": "https://korap.ids-mannheim.de?cq=corpusSigle=WUD17"
+  }
 ]

@@ -1,9 +1,15 @@
+1.0.8-SNAPSHOT
+
+- handle resource pid and resolve resources (virtual corpora) using map (#62)
+
 1.0.7-SNAPSHOT
 
 - update libraries including fcs-simple-endpoint 1.8.0
 - add Dockerfile
 - add institution
 - improve landingPageURI with corpus query
+- Fixed the language of resource description
+
 
 1.0.6-SNAPSHOT
 

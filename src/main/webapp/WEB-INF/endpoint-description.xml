@@ -12,7 +12,6 @@
     <SupportedDataViews>
         <SupportedDataView id="hits" delivery-policy="send-by-default">application/x-clarin-fcs-hits+xml</SupportedDataView>
         <SupportedDataView id="adv" delivery-policy="send-by-default">application/x-clarin-fcs-adv+xml</SupportedDataView>
-        <SupportedDataView id="kwic" delivery-policy="need-to-request">application/x-clarin-fcs-kwic+xml</SupportedDataView>
     </SupportedDataViews>
     <SupportedLayers>
         <SupportedLayer id="l1" result-id="http://clarin.ids-mannheim.de/korapsru/layers/text">text</SupportedLayer>

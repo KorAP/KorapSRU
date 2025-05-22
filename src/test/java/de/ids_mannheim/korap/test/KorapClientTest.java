@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.sru.KorapMatch;
 import de.ids_mannheim.korap.sru.KorapResource;
 import de.ids_mannheim.korap.sru.KorapResult;
 import de.ids_mannheim.korap.sru.QueryLanguage;
+import eu.clarin.sru.server.SRUException;
 
 /**
  * The tests are based on the sample corpus from the Goethe corpus.
@@ -29,10 +30,11 @@ public class KorapClientTest extends BaseTest {
         c = new KorapClient("http://localhost:1080", 25, 50);
     }
 
-    @Test
-    public void testCQLQuery () throws HttpResponseException, IOException {
+	@Test
+	public void testCQLQuery ()
+			throws HttpResponseException, IOException, SRUException {
 
-        createExpectationForSearch("der", "cql", "1.2", "50",
+		   createExpectationForSearch("der", "cql", "1.2", "50",
                 "search-der.jsonld");
 
         result = c.query("der", QueryLanguage.CQL, "1.2", 51, 1, null);
@@ -49,8 +51,9 @@ public class KorapClientTest extends BaseTest {
 
     }
 
-    @Test
-    public void testOrQuery () throws HttpResponseException, IOException {
+	@Test
+	public void testOrQuery ()
+			throws HttpResponseException, IOException, SRUException {
 
         createExpectationForSearch("(\"blaue\"|\"grüne\")", "fcsql", "2.0", "0",
                 "search-or.jsonld");
@@ -106,11 +109,14 @@ public class KorapClientTest extends BaseTest {
     @Test
     public void testRetrieveResource ()
             throws HttpResponseException, Exception {
-        createRetrieveResource();
+        createExpectationForRetrieveResource();
         KorapResource[] resources = c.retrieveResources();
         assertEquals(3, resources.length);
-        assertEquals("WPD17", resources[0].getResourceId());
-        assertEquals("WDD17", resources[1].getResourceId());
-        assertEquals("WUD17", resources[2].getResourceId());
+		assertEquals("http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1",
+				resources[0].getResourceId());
+        assertEquals("http://hdl.handle.net/10932/00-03B6-558F-5EA0-6301-B", 
+        		resources[1].getResourceId());
+        assertEquals("http://hdl.handle.net/10932/00-03B6-558F-6EF0-6401-F", 
+        		resources[2].getResourceId());
     }
 }

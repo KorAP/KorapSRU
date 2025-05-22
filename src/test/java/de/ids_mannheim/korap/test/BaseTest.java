@@ -44,13 +44,13 @@ public class BaseTest extends KorapJerseyTest {
         mockServer.stop();
     }
 
-    protected void createRetrieveResource () throws IOException {
+    protected void createExpectationForRetrieveResource () throws IOException {
         String korapResources = IOUtils.toString(
                 ClassLoader.getSystemResourceAsStream(
                         "korap-api-responses/resources.json"),
                 StandardCharsets.UTF_8);
 
-        mockClient.reset()
+        mockClient
                 .when(request().withMethod("GET").withPath("/resource"))
                 .respond(response()
                         .withHeader(new Header("Content-Type",
@@ -66,7 +66,7 @@ public class BaseTest extends KorapJerseyTest {
                         "korap-api-responses/" + jsonFilename),
                 StandardCharsets.UTF_8);
 
-        mockClient.reset()
+        mockClient
                 .when(request().withMethod("GET").withPath("/search")
                         .withQueryStringParameter("q", query)
                         .withQueryStringParameter("ql", queryLanguage)
