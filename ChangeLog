@@ -1,6 +1,8 @@
 1.0.8-SNAPSHOT
 
 - handle resource pid and resolve resources (virtual corpora) using map (#62)
+- handle empty description.
+
 
 1.0.7-SNAPSHOT
 

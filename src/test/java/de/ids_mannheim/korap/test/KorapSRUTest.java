@@ -373,7 +373,7 @@ public class KorapSRUTest extends BaseTest {
                 .getNamedItem("qualifier").getNodeValue());
 
         nodelist = doc.getElementsByTagName("ed:Resource");
-        assertEquals(3, nodelist.getLength());
+        assertEquals(5, nodelist.getLength());
         children = nodelist.item(0).getChildNodes();
         assertEquals(7, children.getLength());
         assertEquals("ed:Title", children.item(0).getNodeName());
@@ -382,6 +382,11 @@ public class KorapSRUTest extends BaseTest {
         assertEquals("ed:Languages", children.item(4).getNodeName());
         assertEquals("ed:AvailableDataViews", children.item(5).getNodeName());
         assertEquals("ed:AvailableLayers", children.item(6).getNodeName());
+        
+        // no description
+        children = nodelist.item(3).getChildNodes();
+        assertEquals(6, children.getLength());
+        assertEquals("ed:LandingPageURI", children.item(2).getNodeName());
     }
 
 }

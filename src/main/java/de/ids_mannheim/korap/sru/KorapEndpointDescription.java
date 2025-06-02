@@ -118,8 +118,6 @@ public class KorapEndpointDescription implements EndpointDescription {
 
         List<ResourceInfo> resourceList = new ArrayList<ResourceInfo>();
 
-        Map<String, String> description;
-
         KorapResource[] resources;
         try {
             resources = KorapSRU.korapClient.retrieveResources();
@@ -130,8 +128,12 @@ public class KorapEndpointDescription implements EndpointDescription {
         }
 
         for (KorapResource r : resources) {
-            description = new HashMap<String, String>();
-            description.put("en", r.getDescription());
+        	Map<String, String> description = null;
+        	String rDesc = r.getDescription();
+			if (rDesc != null && !rDesc.isEmpty()) {
+				description = new HashMap<String, String>();
+				description.put("en", r.getDescription());
+			}
 
 			ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
 					description, null, r.getLandingPage(),
