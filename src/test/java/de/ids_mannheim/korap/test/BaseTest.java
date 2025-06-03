@@ -58,27 +58,54 @@ public class BaseTest extends KorapJerseyTest {
                         .withBody(korapResources).withStatusCode(200));
     }
 
-    protected void createExpectationForSearch (String query,
-            String queryLanguage, String version, String offset,
-            String jsonFilename) throws IOException {
-        String searchResult = IOUtils.toString(
-                ClassLoader.getSystemResourceAsStream(
-                        "korap-api-responses/" + jsonFilename),
-                StandardCharsets.UTF_8);
+	protected void createExpectationForSearch (String query,
+			String queryLanguage, String version, String offset,
+			String jsonFilename) throws IOException {
+		String searchResult = IOUtils.toString(
+				ClassLoader.getSystemResourceAsStream(
+						"korap-api-responses/" + jsonFilename),
+				StandardCharsets.UTF_8);
 
-        mockClient
+		mockClient
+				.when(request().withMethod("GET").withPath("/search")
+						.withQueryStringParameter("q", query)
+						.withQueryStringParameter("ql", queryLanguage)
+						.withQueryStringParameter("v", version)
+						.withQueryStringParameter("context", "sentence")
+						.withQueryStringParameter("count", "1")
+						.withQueryStringParameter("offset", offset))
+				.respond(response()
+						.withHeader(new Header("Content-Type",
+								"application/json; charset=utf-8"))
+						.withBody(searchResult).withStatusCode(200));
+
+	}
+    
+	protected void createExpectationForSearch (String query,
+			String queryLanguage, String version, String offset, String cq,
+			boolean accessRewriteDisabled, String jsonFilename)
+			throws IOException {
+		String searchResult = IOUtils.toString(
+				ClassLoader.getSystemResourceAsStream(
+						"korap-api-responses/" + jsonFilename),
+				StandardCharsets.UTF_8);
+
+		mockClient
                 .when(request().withMethod("GET").withPath("/search")
                         .withQueryStringParameter("q", query)
                         .withQueryStringParameter("ql", queryLanguage)
+                        .withQueryStringParameter("cq", cq)
                         .withQueryStringParameter("v", version)
                         .withQueryStringParameter("context", "sentence")
                         .withQueryStringParameter("count", "1")
-                        .withQueryStringParameter("offset", offset))
+                        .withQueryStringParameter("offset", offset)
+                        .withQueryStringParameter("access-rewrite-disabled", 
+                        		String.valueOf(accessRewriteDisabled)))
                 .respond(response()
                         .withHeader(new Header("Content-Type",
                                 "application/json; charset=utf-8"))
                         .withBody(searchResult).withStatusCode(200));
-    }
+	}
 
     protected void createExpectationForMatchInfo (String jsonFilename,
             String uriPath) throws IOException {

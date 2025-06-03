@@ -2,6 +2,7 @@
 
 - handle resource pid and resolve resources (virtual corpora) using map (#62)
 - handle empty description.
+- Add cache for virtual corpus access.
 
 
 1.0.7-SNAPSHOT
