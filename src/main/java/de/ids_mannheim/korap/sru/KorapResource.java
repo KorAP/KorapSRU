@@ -14,6 +14,7 @@ public class KorapResource {
     private Map<Integer, String> layers;
     private String institution;
     private String landingPage;
+    private String requiredAccess;
     
     public String getResourceId () {
         return resourceId;
@@ -56,6 +57,12 @@ public class KorapResource {
 	}
 	public void setLandingPage (String landingPage) {
 		this.landingPage = landingPage;
+	}
+	public String getRequiredAccess () {
+		return requiredAccess;
+	}
+	public void setRequiredAccess (String requiredAccess) {
+		this.requiredAccess = requiredAccess;
 	}
 
 }

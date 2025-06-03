@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 
 import org.apache.http.client.HttpResponseException;
 import org.junit.Test;
+import org.mockserver.model.HttpRequest;
 
 import de.ids_mannheim.korap.sru.KorapClient;
 import de.ids_mannheim.korap.sru.KorapMatch;
@@ -119,4 +120,16 @@ public class KorapClientTest extends BaseTest {
         assertEquals("http://hdl.handle.net/10932/00-03B6-558F-6EF0-6401-F", 
         		resources[2].getResourceId());
     }
+    
+    @Test
+    public void testSearchRequest () throws IOException, SRUException {
+    	createExpectationForRetrieveResource();
+		createExpectationForSearch("\"Freizeit\"", "fcsql", "2.0", "0", 
+				"textType = /.*[Rr]oman/", true,
+				"search-public-metadata.jsonld");
+		KorapResult result = c.query("\"Freizeit\"", QueryLanguage.FCSQL, "2.0",
+				1, 1, new String[] { "Romane" });
+		assertEquals(702, result.getTotalResults());
+		assertEquals(0, result.getMatchSize());
+	}
 }

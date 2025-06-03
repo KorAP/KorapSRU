@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,9 @@ public class KorapClient {
             (Logger) LoggerFactory.getLogger(KorapClient.class);
     
     // pid : cq
-    public static Map<String, String> virtualCorpora = new HashMap<>();
+    public static Map<String, String> virtualCorpusQueries = new HashMap<>();
+    // pid : access
+    public static Map<String, Boolean> virtualCorpusAccesses = new HashMap<>();
 
     /**
      * Constructs a KorapClient with the given number of records per
@@ -114,11 +117,16 @@ public class KorapClient {
                 resources = objectMapper.readValue(jsonStream, KorapResource[].class);
                 
                 // update vc map
-                if (resources.length > virtualCorpora.size()) {
+                if (resources.length > virtualCorpusQueries.size()) {
                 	for (KorapResource r : resources) {
                 		String[] urlParts = r.getLandingPage().split("cq=");
+                		boolean freeAccess = false;
+                		if (r.getRequiredAccess().equals("FREE")) {
+                			freeAccess = true;
+                		}
                 		if (urlParts.length > 1 && !urlParts[1].isEmpty()) {
-                			virtualCorpora.put(r.getResourceId(), urlParts[1]);
+                			virtualCorpusQueries.put(r.getResourceId(), urlParts[1]);
+                			virtualCorpusAccesses.put(r.getResourceId(), freeAccess);
                 		}
                 	}
                 }
@@ -196,16 +204,10 @@ public class KorapClient {
             try {
                 result = objectMapper.readValue(jsonStream, KorapResult.class);
             }
-//            catch (IOException e) {
-//                throw new IOException("Failed processing response.");
-//            }
             finally {
                 jsonStream.close();
             }
         }
-//        catch (IOException e) {
-//            throw new IOException("Failed executing HTTP request.", e);
-//        }
         finally {
             if (response != null) {
                 response.close();
@@ -282,7 +284,7 @@ public class KorapClient {
      * @param query
      *            a query string
      * @param queryLanguage
-     *            the query language
+     *            the query languagegetTotalResults()
      * @param version
      *            the query language version
      * @param startRecord
@@ -309,55 +311,50 @@ public class KorapClient {
             maximumRecords = defaultMaxRecords;
         }
         
-        String corpusQuery = resolveVirtualCorpus(corpora);
-//        if (corpora != null && corpora.length > 0) {
-//            for (int i = 0; i < corpora.length; i++) {
-//                corpusQuery += "corpusSigle=" + corpora[i];
-//                if (i != corpora.length - 1) {
-//                    corpusQuery += "|";
-//                }
-//            }
-//        }
-
-        URI uri = createSearchUri(query, queryLanguage, version, startRecord,
-		maximumRecords, corpusQuery, false);
-        
-        logger.info("Query URI: " + uri.toString());
-        HttpGet request = new HttpGet(uri);
-        return request;
-    }
-    
-	private String resolveVirtualCorpus (String[] corpora)
-			throws URISyntaxException, IOException, SRUException {
-		String corpusQuery = "";
+        String corpusQuery = "";
+		boolean freeAccess = true;
     	if (corpora != null && corpora.length > 0) {
             for (int i = 0; i < corpora.length; i++) {
             	String pid = corpora[i]; 
-            	String cq = virtualCorpora.get(pid);
-            	if (cq != null) {
-            		corpusQuery += " & " + cq;
-            	}
-            	else {
+            	String cq = virtualCorpusQueries.get(pid);
+            	
+            	if (cq == null) {
             		retrieveResources();
-            		cq = virtualCorpora.get(pid);
-            		if (cq != null) {
-                		corpusQuery += " & " + cq;
-            		}
-					else {
+            		cq = virtualCorpusQueries.get(pid);
+					if (cq == null) {
 						throw new SRUException(
 								SRUConstants.SRU_GENERAL_SYSTEM_ERROR,
 								"Virtual corpus with pid: " + pid
 										+ " is not found.");
 					}
-        		}            	
+				}
+            	cq = URLDecoder.decode(cq, "utf-8");
+        		if (i == 0) {
+        			corpusQuery = cq;
+        		}
+        		else {
+        			corpusQuery += " & " + cq;
+        		}
+        		
+        		if (!virtualCorpusAccesses.get(pid)) {
+            		freeAccess = false;
+            	}
             }
         }
-    	return corpusQuery;
-	}
+
+        URI uri = createSearchUri(query, queryLanguage, version, startRecord,
+		maximumRecords, corpusQuery, freeAccess);
+        
+//        logger.info("Query URI: " + uri.toString());
+        System.out.println(uri.toString());
+        HttpGet request = new HttpGet(uri);
+        return request;
+    }
+    
     
 	private URI createSearchUri (String query, QueryLanguage queryLanguage,
 			String version, int startRecord, int maximumRecords,
-			String corpusQuery, boolean authenticationRequired)
+			String corpusQuery, boolean freeAccess)
 			throws URISyntaxException {
 
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -373,7 +370,7 @@ public class KorapClient {
 		params.add(
 				new BasicNameValuePair("offset", String.valueOf(startRecord)));
 
-		if (authenticationRequired) {
+		if (!freeAccess) {
 			params.add(
 					new BasicNameValuePair("access-rewrite-disabled", "true"));
 		}

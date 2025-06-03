@@ -1,0 +1,210 @@
+{
+  "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+  "meta": {
+    "count": 1,
+    "startIndex": 0,
+    "timeout": 90000,
+    "context": "base/s:s",
+    "fields": [
+      "ID",
+      "UID",
+      "textSigle",
+      "corpusID",
+      "author",
+      "title",
+      "subTitle",
+      "textClass",
+      "pubPlace",
+      "pubDate",
+      "availability",
+      "layerInfos",
+      "docSigle",
+      "corpusSigle"
+    ],
+    "version": "0.64.0",
+    "benchmark": "2.79172047 s",
+    "totalResources": -1,
+    "totalResults": 702,
+    "serialQuery": "SpanMultiTermQueryWrapper(tokens:/s:Freizeit/)",
+    "itemsPerPage": 1
+  },
+  "query": {
+    "@type": "koral:token",
+    "wrap": {
+      "@type": "koral:term",
+      "key": "Freizeit",
+      "foundry": "opennlp",
+      "layer": "orth",
+      "type": "type:regex",
+      "match": "match:eq"
+    }
+  },
+  "collection": {
+    "@type": "koral:docGroup",
+    "operation": "operation:and",
+    "operands": [
+      {
+        "operands": [
+          {
+            "@type": "koral:doc",
+            "match": "match:eq",
+            "type": "type:regex",
+            "value": "CC.*",
+            "key": "availability"
+          },
+          {
+            "operands": [
+              {
+                "@type": "koral:doc",
+                "match": "match:eq",
+                "type": "type:regex",
+                "value": "ACA.*",
+                "key": "availability"
+              },
+              {
+                "operands": [
+                  {
+                    "@type": "koral:doc",
+                    "match": "match:eq",
+                    "type": "type:regex",
+                    "value": "QAO-NC",
+                    "key": "availability"
+                  },
+                  {
+                    "@type": "koral:doc",
+                    "match": "match:eq",
+                    "type": "type:regex",
+                    "value": "QAO.*",
+                    "key": "availability"
+                  }
+                ],
+                "@type": "koral:docGroup",
+                "operation": "operation:or"
+              }
+            ],
+            "@type": "koral:docGroup",
+            "operation": "operation:or"
+          }
+        ],
+        "@type": "koral:docGroup",
+        "operation": "operation:or"
+      },
+      {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": ".*[Rr]oman",
+        "key": "textType"
+      }
+    ],
+    "rewrites": [
+      {
+        "@type": "koral:rewrite",
+        "src": "Kustvakt",
+        "editor": "Kustvakt",
+        "operation": "operation:override",
+        "original": {
+          "@type": "koral:doc",
+          "match": "match:eq",
+          "type": "type:regex",
+          "value": ".*[Rr]oman",
+          "key": "textType"
+        },
+        "_comment": "All corpus access policy has been added."
+      }
+    ]
+  },
+  "matches": [
+    {
+      "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+      "meta": {},
+      "hasSnippet": false,
+      "hasTokens": false,
+      "matchID": "match-GR1/TL1/09008-p9047-9048x_tCjqTBKUA_ThfzoAYf4uSWtbbm2eLBIvf0CNfdYtNWo",
+      "fields": [
+        {
+          "@type": "koral:field",
+          "key": "ID"
+        },
+        {
+          "@type": "koral:field",
+          "key": "textSigle",
+          "type": "type:string",
+          "value": "GR1/TL1/09008"
+        },
+        {
+          "@type": "koral:field",
+          "key": "corpusID"
+        },
+        {
+          "@type": "koral:field",
+          "key": "author",
+          "type": "type:text",
+          "value": "de Groot, Anne"
+        },
+        {
+          "@type": "koral:field",
+          "key": "title",
+          "type": "type:text",
+          "value": "Dein Vater wird uns liebgewinnen"
+        },
+        {
+          "@type": "koral:field",
+          "key": "subTitle",
+          "type": "type:text",
+          "value": "Delias Leidensweg"
+        },
+        {
+          "@type": "koral:field",
+          "key": "textClass"
+        },
+        {
+          "@type": "koral:field",
+          "key": "pubPlace",
+          "type": "type:string",
+          "value": "Hamburg"
+        },
+        {
+          "@type": "koral:field",
+          "key": "pubDate",
+          "type": "type:date",
+          "value": "1990"
+        },
+        {
+          "@type": "koral:field",
+          "key": "availability",
+          "type": "type:string",
+          "value": "QAO-NC"
+        },
+        {
+          "@type": "koral:field",
+          "key": "layerInfos",
+          "type": "type:store",
+          "value": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens"
+        },
+        {
+          "@type": "koral:field",
+          "key": "docSigle",
+          "type": "type:string",
+          "value": "GR1/TL1"
+        },
+        {
+          "@type": "koral:field",
+          "key": "corpusSigle",
+          "type": "type:string",
+          "value": "GR1"
+        }
+      ],
+      "textSigle": "GR1/TL1/09008",
+      "author": "de Groot, Anne",
+      "title": "Dein Vater wird uns liebgewinnen",
+      "subTitle": "Delias Leidensweg",
+      "pubPlace": "Hamburg",
+      "pubDate": "1990",
+      "availability": "QAO-NC",
+      "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+      "docSigle": "GR1/TL1",
+      "corpusSigle": "GR1"
+    }
+  ]
+}
