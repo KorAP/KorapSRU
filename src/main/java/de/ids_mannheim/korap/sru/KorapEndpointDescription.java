@@ -128,15 +128,24 @@ public class KorapEndpointDescription implements EndpointDescription {
         }
 
         for (KorapResource r : resources) {
-        	Map<String, String> description = null;
-        	String rDesc = r.getDescription();
-			if (rDesc != null && !rDesc.isEmpty()) {
-				description = new HashMap<String, String>();
-				description.put("en", r.getDescription());
+        	Map<String, String> descriptionMap = null;
+        	String desc = r.getDescription();
+			if (desc != null && !desc.isEmpty()) {
+				descriptionMap = new HashMap<String, String>();
+				descriptionMap.put("en", desc);
 			}
 
+			// EM: this requires institution language in Kustvakt, 
+			// omitted for now as it is optional
+			Map<String, String> institutionMap = null;
+//			String inst = r.getInstitution(); 
+//			if (inst!= null && !inst.isEmpty()) {
+//				institutionMap = new HashMap<String, String>();
+//				institutionMap.put("en", inst);
+//			}
+			
 			ResourceInfo ri = new ResourceInfo(r.getResourceId(), r.getTitles(),
-					description, null, r.getLandingPage(),
+					descriptionMap, institutionMap, r.getLandingPage(),
 					Arrays.asList(r.getLanguages()),
 					AvailabilityRestriction.NONE, dataviews,
 					this.getSupportedLayers(), null);

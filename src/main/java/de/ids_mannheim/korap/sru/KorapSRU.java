@@ -102,7 +102,7 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
 //        logger.info("korapsru query: " + queryStr);
 
         KorapResult korapResult = sendQuery(queryStr, request, version,
-                queryLanguage);
+                queryLanguage, diagnostics);
         checkKorapResultError(korapResult, queryLanguage,
                 isRewitesAllowed(request), diagnostics);
 //        logger.info("Number of records: "+korapResult.getTotalResults());
@@ -190,12 +190,13 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
     }
 
     private KorapResult sendQuery(String queryStr, SRURequest request,
-            String version, QueryLanguage queryLanguage) throws SRUException {
+            String version, QueryLanguage queryLanguage, SRUDiagnosticList 
+            diagnostics) throws SRUException {
 
         try {
             return korapClient.query(queryStr, queryLanguage, version,
                     request.getStartRecord(), request.getMaximumRecords(),
-                    getCorporaList(request));
+                    getCorporaList(request), diagnostics);
         }
         catch (HttpResponseException e) {
             logger.warn("HttpResponseException: " + e.getStatusCode() + " "
