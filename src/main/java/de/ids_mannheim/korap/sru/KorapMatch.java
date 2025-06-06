@@ -24,7 +24,7 @@ public class KorapMatch {
 
     private List<AnnotationLayer> annotationLayers = new ArrayList<AnnotationLayer>();
     
-    private static Pattern idPattern = Pattern.compile("match-(.*)/(.*)/(.*)-p([0-9]+-[0-9]+)");
+    private static Pattern idPattern = Pattern.compile("match-(.*)/(.*)/(.*)-p([0-9]+-[0-9]+.*)");
 
     public KorapMatch () {}
     
