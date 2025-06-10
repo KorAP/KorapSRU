@@ -189,14 +189,20 @@ public class KorapClient {
         }
 
         boolean freeAccess = true;
-        
+        String ref = "";
         HttpUriRequest httpRequest = null;
         try {
         	String corpusQuery = obtainCorpusQuery(corpora);
+        	ref = KorapSRU.korapWebUri + "?q="+query+"&ql="+queryLanguage;
+        	if (!corpusQuery.isEmpty()) {
+        		ref = ref +"&cq="+corpusQuery;
+        		corpusQuery = URLDecoder.decode(corpusQuery, "utf-8");
+        	}
             freeAccess = isAccessFree(corpora);
             httpRequest = createSearchRequest(query, queryLanguage, version,
                     startRecord - 1, maximumRecords, corpusQuery,
                     freeAccess);
+            
         }
         catch (URISyntaxException e) {
             throw new IOException("Failed creating http request.");
@@ -212,6 +218,7 @@ public class KorapClient {
                     new BufferedInputStream(response.getEntity().getContent());
             try {
                 result = objectMapper.readValue(jsonStream, KorapResult.class);
+                result.setResourceReference(ref);
             }
             finally {
                 jsonStream.close();
@@ -227,7 +234,6 @@ public class KorapClient {
         if (!freeAccess) {
         	result.getMatches().clear();
         }
-        	
         return result;
     }
 
@@ -249,7 +255,7 @@ public class KorapClient {
 										+ " is not found.");
 					}
 				}
-            	cq = URLDecoder.decode(cq, "utf-8");
+            	//cq = URLDecoder.decode(cq, "utf-8");
         		if (i == 0) {
         			corpusQuery = cq;
         		}
@@ -377,7 +383,7 @@ public class KorapClient {
 		maximumRecords, corpusQuery, freeAccess);
         
 //        logger.info("Query URI: " + uri.toString());
-//        System.out.println(uri.toString());
+        System.out.println(uri.toString());
         HttpGet request = new HttpGet(uri);
         return request;
     }

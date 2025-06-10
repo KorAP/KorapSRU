@@ -107,7 +107,8 @@ public class KorapSRU extends SimpleEndpointSearchEngineBase {
                 isRewitesAllowed(request), diagnostics);
 //        logger.info("Number of records: "+korapResult.getTotalResults());
 
-        return new KorapSRUSearchResultSet(korapClient, diagnostics, korapResult, dataviews,
+        return new KorapSRUSearchResultSet(korapClient, diagnostics, 
+        		korapResult, dataviews,
                 korapEndpointDescription.getTextLayer(),
                 korapEndpointDescription.getAnnotationLayers());
     }

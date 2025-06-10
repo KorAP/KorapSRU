@@ -11,6 +11,7 @@ public class KorapResult {
     private List<KorapMatch> matches;
     private List<List<Object>> errors;
     private KorapMeta metadata;
+    private String resourceReference;
 
     public KorapResult () {
         matches = new ArrayList<KorapMatch>();
@@ -55,4 +56,12 @@ public class KorapResult {
     public void setMetadata (KorapMeta metadata) {
         this.metadata = metadata;
     }
+
+	public String getResourceReference () {
+		return resourceReference;
+	}
+
+	public void setResourceReference (String resourceReference) {
+		this.resourceReference = resourceReference;
+	}
 }

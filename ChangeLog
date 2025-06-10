@@ -6,6 +6,7 @@
 - Implemented search for protected resources by using public metadata search 
   web-service and adding Diagnostics. (#64)
 - Added support for match-id with signatures. 
+- 
 
 1.0.7-SNAPSHOT
 

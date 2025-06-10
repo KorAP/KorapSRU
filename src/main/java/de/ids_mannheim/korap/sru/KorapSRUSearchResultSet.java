@@ -46,6 +46,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     private Layer textLayer;
     private AnnotationHandler annotationHandler;
     private KorapClient korapClient;
+    private String reference;
 
     /**
      * Constructs a KorapSRUSearchResultSet for the given KorapResult.
@@ -80,6 +81,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         this.korapResult = korapResult;
         this.dataviews = dataviews;
         this.textLayer = textlayer;
+        this.reference = korapResult.getResourceReference();
         annotationHandler = new AnnotationHandler(annotationLayers);
     }
 
@@ -114,7 +116,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         KorapMatch match = korapResult.getMatch(i);
         match.parseMatchId();
         XMLStreamWriterHelper.writeStartResource(writer, match.getMatchId(),
-                null);
+                reference);
         XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
 
         List<AnnotationLayer> annotationLayers;
