@@ -115,7 +115,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
     public void writeRecord(XMLStreamWriter writer) throws XMLStreamException {
         KorapMatch match = korapResult.getMatch(i);
         match.parseMatchId();
-        XMLStreamWriterHelper.writeStartResource(writer, match.getMatchId(),
+        XMLStreamWriterHelper.writeStartResource(writer, null,
                 reference);
         XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
 
