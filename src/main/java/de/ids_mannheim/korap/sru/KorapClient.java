@@ -233,6 +233,7 @@ public class KorapClient {
         // remove matches for public search metadata response
         if (!freeAccess) {
         	result.getMatches().clear();
+        	result.getMatches().add(new KorapMatch());
         }
         return result;
     }

@@ -113,18 +113,20 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
 
     @Override
     public void writeRecord(XMLStreamWriter writer) throws XMLStreamException {
-        KorapMatch match = korapResult.getMatch(i);
-        match.parseMatchId();
         XMLStreamWriterHelper.writeStartResource(writer, null,
                 reference);
-        XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
-
-        List<AnnotationLayer> annotationLayers;
-        annotationLayers = parseAnnotations(match);
-
-        writeAdvancedDataView(writer, annotationLayers);
-
-        XMLStreamWriterHelper.writeEndResourceFragment(writer);
+        KorapMatch match = korapResult.getMatch(i);
+        if (match.getMatchId() != null) {
+        	match.parseMatchId();
+        	
+        	XMLStreamWriterHelper.writeStartResourceFragment(writer, null, null);
+        
+            List<AnnotationLayer> annotationLayers;
+            annotationLayers = parseAnnotations(match);
+            writeAdvancedDataView(writer, annotationLayers);
+        
+            XMLStreamWriterHelper.writeEndResourceFragment(writer);
+        }
         XMLStreamWriterHelper.writeEndResource(writer);
     }
 
@@ -164,7 +166,7 @@ public class KorapSRUSearchResultSet extends SRUSearchResultSet {
         if (match == null) {
             throw new NullPointerException("KorapMatch is null.");
         }
-
+        
         try {
             String annotationSnippet = korapClient.retrieveAnnotations(
                     match.getCorpusId(), match.getDocId(), match.getTextId(),
