@@ -135,8 +135,9 @@ public class KorapClientTest extends BaseTest {
 			@Override
 			public void addDiagnostic (String uri, String details,
 					String message) {
-				System.out.println("Diagnostics: " + uri + "; Details: "
-						+ details + "; Message: "+message);
+				assertEquals("info:srw/diagnostic/1/3", uri);
+				assertEquals("The results could not be shown due to lack of authentication.", details);
+				assertEquals("Authentication required.", message);
 
 			}
 		};

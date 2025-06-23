@@ -138,7 +138,8 @@ public class KorapSRUTest extends BaseTest {
                         .queryParam("query", "fein").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSearchRetrieveResponseSRUVersion1_2(entity);
+        String url = "http://localhost:1080?q=fein&ql=cql";
+        checkSearchRetrieveResponseSRUVersion1_2(entity,url);
     }
 
     @Test
@@ -155,7 +156,8 @@ public class KorapSRUTest extends BaseTest {
                 .queryParam("x-fcs-context", "http://hdl.handle.net/10932/00-03B6-558F-4E10-6201-1").get(ClientResponse.class);
 
         InputStream entity = response.getEntity(InputStream.class);
-        checkSearchRetrieveResponseSRUVersion1_2(entity);
+        String url = "http://localhost:1080?q=fein&ql=cql&cq=corpusSigle%3DWPD17";
+        checkSearchRetrieveResponseSRUVersion1_2(entity,url);
     }
     
     @Test

@@ -3,10 +3,13 @@
 - handle resource pid and resolve resources (virtual corpora) using map (#62)
 - handle empty description.
 - Add cache for virtual corpus access.(#63)
-- Implemented search for protected resources by using public metadata search 
+- Implement search for protected resources by using public metadata search 
   web-service and adding Diagnostics. (#64)
-- Added support for match-id with signatures. 
+- Add support for match-id with signatures. 
 - Add resource reference.
+- Disable pid for resource in the results
+- Implement search on a protected resource returning one result with 
+  a URL reference
 
 1.0.7-SNAPSHOT
 

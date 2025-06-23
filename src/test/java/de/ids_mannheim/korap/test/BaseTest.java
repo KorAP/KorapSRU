@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -124,7 +125,8 @@ public class BaseTest extends KorapJerseyTest {
                         .withBody(matchInfoResult).withStatusCode(200));
     }
 
-    protected Document checkSearchRetrieveResponseSRUVersion1_2 (InputStream entity)
+    protected Document checkSearchRetrieveResponseSRUVersion1_2 (InputStream 
+    		entity, String url)
             throws SAXException, IOException, ParserConfigurationException {
 
         docBuilder = factory.newDocumentBuilder();
@@ -137,9 +139,12 @@ public class BaseTest extends KorapJerseyTest {
                 nodelist.item(0).getTextContent());
 
         NodeList resources = doc.getElementsByTagName("fcs:Resource");
-        String attr = resources.item(0).getAttributes().getNamedItem("pid")
+        String attr = resources.item(0).getAttributes().getNamedItem("ref")
                 .getNodeValue();
 
+        assertNotNull(attr);
+        assertEquals(url, attr);
+        
         nodelist = doc.getElementsByTagName("fcs:DataView");
         attr = nodelist.item(0).getAttributes().getNamedItem("type")
                 .getNodeValue();
@@ -181,8 +186,10 @@ public class BaseTest extends KorapJerseyTest {
                 nodelist.item(0).getTextContent());
 
         NodeList resources = doc.getElementsByTagName("fcs:Resource");
-        String attr = resources.item(0).getAttributes().getNamedItem("pid")
+        String attr = resources.item(0).getAttributes().getNamedItem("ref")
                 .getNodeValue();
+
+        assertNotNull(attr);
 
         nodelist = doc.getElementsByTagName("fcs:DataView");
         attr = nodelist.item(0).getAttributes().getNamedItem("type")

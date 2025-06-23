@@ -384,7 +384,7 @@ public class KorapClient {
 		maximumRecords, corpusQuery, freeAccess);
         
 //        logger.info("Query URI: " + uri.toString());
-        System.out.println(uri.toString());
+//        System.out.println(uri.toString());
         HttpGet request = new HttpGet(uri);
         return request;
     }
