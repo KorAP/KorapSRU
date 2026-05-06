@@ -1,3 +1,7 @@
+1.0.9-SNAPSHOT
+
+- update libraries including fcs-simple-endpoint 2.0.0
+
 1.0.8-SNAPSHOT
 
 - handle resource pid and resolve resources (virtual corpora) using map (#62)

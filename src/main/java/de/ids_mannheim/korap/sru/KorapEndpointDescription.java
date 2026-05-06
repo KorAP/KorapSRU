@@ -20,6 +20,7 @@ import eu.clarin.sru.server.fcs.DataView;
 import eu.clarin.sru.server.fcs.DataView.DeliveryPolicy;
 import eu.clarin.sru.server.fcs.EndpointDescription;
 import eu.clarin.sru.server.fcs.Layer;
+import eu.clarin.sru.server.fcs.LexField;
 import eu.clarin.sru.server.fcs.ResourceInfo;
 import eu.clarin.sru.server.fcs.ResourceInfo.AvailabilityRestriction;
 import eu.clarin.sru.server.fcs.utils.SimpleEndpointDescriptionParser;
@@ -148,7 +149,7 @@ public class KorapEndpointDescription implements EndpointDescription {
 					descriptionMap, institutionMap, r.getLandingPage(),
 					Arrays.asList(r.getLanguages()),
 					AvailabilityRestriction.NONE, dataviews,
-					this.getSupportedLayers(), null);
+					this.getSupportedLayers(), null, null, null);
 			resourceList.add(ri);
         }
 
@@ -245,6 +246,12 @@ public class KorapEndpointDescription implements EndpointDescription {
 
 	@Override
 	public ResourceInfo getResource (String pid) throws SRUException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<LexField> getSupportedLexFields () {
 		// TODO Auto-generated method stub
 		return null;
 	}
