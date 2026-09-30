@@ -47,11 +47,10 @@ in FCS query: ```[tt:lemma=".*heit"]```
   
 ## Software Requirements
   
-* Java 8 (JDK 1.8 or OpenJDK 8)
+* Java 21
  
-* Tomcat 7
+* Tomcat 9 (tested on)
 
-* Kustvakt
 
 ## Installation
 
