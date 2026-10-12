@@ -21,11 +21,12 @@ RUN addgroup -S korap && \
 USER korap-sru
 
 # Install tomcat
-RUN wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.102/bin/apache-tomcat-9.0.102.tar.gz && \
-    tar xvzf apache-tomcat-9.0.102.tar.gz \
+# Alternatives from https://archive.apache.org/dist/tomcat/
+RUN wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.105/bin/apache-tomcat-9.0.105.tar.gz && \
+    tar xvzf apache-tomcat-9.0.105.tar.gz \
         --strip-components 1 \
         --directory /tomcat && \
-    rm apache-tomcat-9.0.102.tar.gz
+    rm apache-tomcat-9.0.105.tar.gz
 
 RUN git config --global user.email "korap+docker@ids-mannheim.de" && \
     git config --global user.name "Docker"
