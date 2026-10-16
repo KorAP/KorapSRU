@@ -1,5 +1,5 @@
-# Requires Java 8 and Tomcat 9
-FROM eclipse-temurin:8-jdk-alpine AS builder
+# Requires Java 25 and Tomcat 9
+FROM eclipse-temurin:25-jdk-alpine AS builder
 
 # Copy repository respecting .dockerignore
 COPY . /korap-sru
@@ -22,11 +22,11 @@ USER korap-sru
 
 # Install tomcat
 # Alternatives from https://archive.apache.org/dist/tomcat/
-RUN wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.105/bin/apache-tomcat-9.0.105.tar.gz && \
-    tar xvzf apache-tomcat-9.0.105.tar.gz \
+RUN wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.123/bin/apache-tomcat-9.0.123.tar.gz && \
+    tar xvzf apache-tomcat-9.0.123.tar.gz \
         --strip-components 1 \
         --directory /tomcat && \
-    rm apache-tomcat-9.0.105.tar.gz
+    rm apache-tomcat-9.0.123.tar.gz
 
 RUN git config --global user.email "korap+docker@ids-mannheim.de" && \
     git config --global user.name "Docker"
@@ -38,7 +38,7 @@ RUN rm -r /tomcat/webapps/*
 
 RUN find target/KorapSRU-*.war -exec unzip {} -d /tomcat/webapps/ROOT ';'
 
-EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT [ "/tomcat/bin/catalina.sh" ]
 
@@ -49,8 +49,4 @@ LABEL maintainer="korap@ids-mannheim.de"
 LABEL repository="https://github.com/KorAP/KorapSRU"
 
 # docker build -f Dockerfile -t korap/korap-sru:{nr} .
-# docker run --network host --name korap-sru --rm \
-#            -v ${PWD}/WEB-INF/endpoint-description.xml:/tomcat/webapps/ROOT/WEB-INF/endpoint-description.xml \
-#            -v ${PWD}/WEB-INF/sru-server-config.xml:/tomcat/webapps/ROOT/WEB-INF/sru-server-config.xml \
-#            -v ${PWD}/WEB-INF/web.xml:/tomcat/webapps/ROOT/WEB-INF/web.xml \
-#        korap/korap-sru:{nr}
+# docker run -p 8081:8080 --name korap-sru --rm -v ${PWD}/WEB-INF/endpoint-description.xml:/tomcat/webapps/ROOT/WEB-INF/endpoint-description.xml -v ${PWD}/WEB-INF/sru-server-config.xml:/tomcat/webapps/ROOT/WEB-INF/sru-server-config.xml -v ${PWD}/WEB-INF/web.xml:/tomcat/webapps/ROOT/WEB-INF/web.xml korap/korap-sru:{nr}
